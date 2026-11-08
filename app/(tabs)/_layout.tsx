@@ -1,7 +1,9 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { getDb } from '@/db';
+import { isOnboardingComplete } from '@/features/onboarding/onboarding';
 import { useTheme } from '@/theme';
 
 // Minimal inline icons (Material Symbols paths) to avoid an icon-font dependency in Phase 1.
@@ -25,6 +27,7 @@ const icon = (d: string) =>
 
 export default function TabsLayout() {
   const { colors, typography } = useTheme();
+  if (!isOnboardingComplete(getDb())) return <Redirect href="/welcome" />;
   return (
     <Tabs
       screenOptions={{

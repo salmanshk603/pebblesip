@@ -99,3 +99,43 @@
 **Actions before next phase**
 - [ ] Keep `schema.ts` and `MIGRATIONS` in step for every schema change (append a migration, never edit v1).
 - [ ] Confirm the streak rule above with the PRD owner.
+
+### Audit: Phase 3 (Onboarding), 2026-11-08
+
+**Plan items**
+| Item | Status | Notes |
+|---|---|---|
+| 4 steps: welcome/Pip → weight/activity/climate → wake/sleep → units | ✅ | `app/(onboarding)/welcome, about, day, units`. Progress dots + Skip on every step (Skip keeps the defaults and moves on). Layout follows `design/light/onboarding.jpg`. |
+| Goal formula + editable result + disclaimer | ✅ | `goal.tsx` uses `calcGoalMl`; ±50 ml (or ±1 oz) stepper, "Reset to suggested", "General guidance, not medical advice." |
+| Save to settings; complete flag routes to Home | ✅ | `completeOnboarding()` writes weight, units, activity, climate, wake/sleep, volume unit and goal (via `setGoalMl`) plus `onboarding_complete` in one transaction. `(tabs)/_layout` redirects to `/welcome` until it's set. |
+| Notification permission with explanation | ✅ | `notifications.tsx` creates the `reminders` channel first (Android 13 only prompts once a channel exists), then asks. |
+
+**testing.md §1 results (emulator, API 37, light mode)**
+| Check | Result |
+|---|---|
+| Fresh install shows onboarding; completing it lands on Home | ✅ |
+| Goal per formula (70 kg, moderate, mild → 2,550 ml) | ✅ on screen and in a unit test |
+| Goal clamps 1,200–4,500 ml | ✅ unit tests (`calcGoalMl`, `finalGoalMl`); the stepper also stops at the limits |
+| Goal editable before finishing | ✅ edited to 2,650 ml; relaunch log showed `today 0/2650 ml` |
+| ml/oz choice applied everywhere | ✅ for the screens that exist (goal showed 86 oz). Re-check on Home/Stats/widgets later. |
+| Denying notifications still completes (gentle note) | ✅ "No problem. You can turn reminders on any time in Settings." |
+| Relaunch doesn't show onboarding again | ✅ after force-stop + relaunch |
+| (extra) Allow path | ✅ `POST_NOTIFICATIONS: granted=true`, lands on Home |
+
+**Deviations from plan / PRD**
+- Weight uses a −/+ stepper (hold to repeat) instead of the slider in the Stitch design. No slider dependency, and it gives 48dp targets. Range 30–250 kg.
+- After onboarding the app goes straight to Home. PRD §7 flow 1 has "paywall (skip)" next; the paywall is Phase 9.
+- Wake and bed time can't be equal (Continue is disabled with a message). Other validation, like a very short day, isn't enforced yet.
+- New dependencies: `expo-notifications`, `@react-native-community/datetimepicker`, `@expo/vector-icons` (MaterialCommunityIcons).
+- Not checked in dark mode yet, and not on the physical phone.
+
+**Code health**
+- Orphaned / unused files: none. The Phase 1 placeholder `welcome.tsx` was replaced.
+- TODOs / hard-coded values: onboarding copy is inline English (fine for now; localisation is later). `REMINDER_CHANNEL_ID` lives in the onboarding screen; move it to `src/features/reminders` in Phase 5.
+- Type errors / lint warnings: none. 36 Jest tests pass (5 new for onboarding save/goal/time helpers).
+- Premium gating correct? N/A.
+- Out-of-scope features accidentally added? No.
+
+**Actions before next phase**
+- [ ] Decide the primary colour (Stitch `#006A61` vs PRD `#7FD1C7`). Home is the first big visual screen.
+- [ ] Move `REMINDER_CHANNEL_ID` into the reminders feature in Phase 5.

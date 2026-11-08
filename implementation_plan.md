@@ -50,10 +50,10 @@
 - [x] Unit tests for goal calc, streak calc and rollups (Jest)
 
 ## Phase 3: Onboarding
-- [ ] 4 steps: welcome/Pip → weight/activity/climate → wake/sleep → units
-- [ ] Goal formula (prd.md §5.1) + editable result screen + disclaimer
-- [ ] Save to settings; "onboarding complete" flag routes to Home
-- [ ] Notification permission request (Android 13+) with explanation screen
+- [x] 4 steps: welcome/Pip → weight/activity/climate → wake/sleep → units
+- [x] Goal formula (prd.md §5.1) + editable result screen + disclaimer
+- [x] Save to settings; "onboarding complete" flag routes to Home
+- [x] Notification permission request (Android 13+) with explanation screen
 
 ## Phase 4: Home / logging
 - [ ] Progress ring/fill + today total vs goal + %
