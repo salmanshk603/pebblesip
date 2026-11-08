@@ -1,4 +1,5 @@
 // Source: design/tokens.json (Stitch export). Keep in sync.
+// Decision 2026-11-08: Stitch #006A61 is the primary colour; PRD Pastel Aqua is a brand accent only.
 export const brand = {
   pastelAqua: '#7FD1C7',
   stone: '#A8A39A',

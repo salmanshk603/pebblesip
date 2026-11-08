@@ -63,7 +63,7 @@
 **Actions before next phase**
 - [ ] Every widget file must start with `'use no memo';` (BUG-001); keep this in mind for Phase 7.
 - [ ] Not a git repository yet. Run `git init` and make a first commit before Phase 2.
-- [ ] Decide on the canonical primary colour (Stitch `#006A61` vs PRD `#7FD1C7`).
+- [x] Decide on the canonical primary colour → Stitch `#006A61` (2026-11-08).
 - [ ] Physical phone is only reliable over wireless debugging (USB link drops); use `adb connect <ip:port>`.
 
 ### Audit: Phase 2 (Local data layer), 2026-11-08
@@ -137,5 +137,5 @@
 - Out-of-scope features accidentally added? No.
 
 **Actions before next phase**
-- [ ] Decide the primary colour (Stitch `#006A61` vs PRD `#7FD1C7`). Home is the first big visual screen.
+- [x] Decide the primary colour → **Stitch `#006A61`** (decided 2026-11-08). PRD Pastel Aqua `#7FD1C7` stays as `brand.pastelAqua` for accents.
 - [ ] Move `REMINDER_CHANNEL_ID` into the reminders feature in Phase 5.

@@ -16,7 +16,7 @@ Phase 4: Home / logging (see `implementation_plan.md` → Phase 4).
 - Respect the saved volume unit (ml/oz).
 
 ## Before starting
-- Decide the primary colour (Stitch `#006A61` vs PRD `#7FD1C7`).
+- Primary colour decided: Stitch `#006A61` (`colors.primary`); Pastel Aqua `#7FD1C7` only as a brand accent.
 - Remove the dev-only `[db] ready` log from `app/_layout.tsx` once Home shows real data.
 
 ## Out of scope for this task
