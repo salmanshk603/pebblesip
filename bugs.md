@@ -30,6 +30,22 @@ _None._
 
 ## Fixed
 
+### BUG-002: Home water level is drawn one step behind
+- **Status:** Fixed (2026-11-08)
+- **Severity:** Medium (wrong visual; numbers are right)
+- **Device / Android version:** Emulator Medium_Phone_API_37.0
+- **Build:** 0.1.0 dev client, Phase 4 work in progress
+- **Steps to reproduce:**
+  1. Goal 2,550 ml, 0 logged. Tap +500 ml twice (1,000 ml, 39%).
+  2. Tap Undo (500 ml, 20%). Or let the day roll over at midnight.
+- **Expected:** the reservoir water animates to 39%, then down to 20% (or to 0% at midnight).
+- **What happens:** at 1,000 ml it shows the 500 ml level; after undo it shows the 1,000 ml level. After midnight it stays at yesterday's level.
+- **Error / logs:** a debug log shows the `level` shared value does reach the new target (`+1s level 0`), so the animation runs but the Skia path isn't redrawn from it.
+- **Files involved:** `src/features/hydration/water-reservoir.tsx`
+- **Hypothesis:** the `useDerivedValue` worklets call a helper (`makeWave`) that reads `level.value` / `phase.value`. Reanimated finds a derived value's inputs from shared values referenced directly in its worklet, so neither is tracked. The path only recomputes when React re-renders (new worklet), using whatever `level` was at that moment, which is the previous value.
+- **Fix:** `useDerivedValue` now reads `level.value` and `phase.value` directly and passes them to a pure `makeWave(lvl, ph, …)`. Verified on the emulator: 500 → 1,000 → 1,500 ml then undo shows 20% / 39% / 59% / 39%, and the midnight rollover empties the reservoir. Rule: never read shared values only inside a helper called from a derived worklet.
+- **Fix plan (as followed):** read `level.value` and `phase.value` directly inside each `useDerivedValue` and pass them into a pure path builder. Remove the debug logs. Re-test: +500 twice, undo, and the midnight rollover; the level should match the % each time.
+
 ### BUG-001: Hello widget is never drawn on the home screen
 - **Status:** Fixed (2026-11-08)
 - **Severity:** High (blocks the Phase 1 widget spike)

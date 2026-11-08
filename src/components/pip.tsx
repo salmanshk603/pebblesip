@@ -3,7 +3,7 @@ import Svg, { Circle, Defs, Ellipse, LinearGradient, Path, Stop } from 'react-na
 import { brand } from '@/theme/colors';
 
 /** Pip, the sea-glass pebble (from the Stitch design, design/brand). Static for now; motion comes in Phase 4/10. */
-export function Pip({ size = 160 }: { size?: number }) {
+export function Pip({ size = 160, eyesClosed = false }: { size?: number; eyesClosed?: boolean }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100" accessibilityLabel="Pip the pebble">
       <Defs>
@@ -25,10 +25,31 @@ export function Pip({ size = 160 }: { size?: number }) {
         opacity={0.6}
         transform="rotate(-20 36 28)"
       />
-      <Circle cx={42} cy={48} r={3.5} fill={brand.pipEye} />
-      <Circle cx={43.2} cy={46.8} r={1.2} fill="#FFFFFF" />
-      <Circle cx={64} cy={48} r={3.5} fill={brand.pipEye} />
-      <Circle cx={65.2} cy={46.8} r={1.2} fill="#FFFFFF" />
+      {eyesClosed ? (
+        <>
+          <Path
+            d="M 38.5 48.5 Q 42 50.5 45.5 48.5"
+            stroke={brand.pipEye}
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+          />
+          <Path
+            d="M 60.5 48.5 Q 64 50.5 67.5 48.5"
+            stroke={brand.pipEye}
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </>
+      ) : (
+        <>
+          <Circle cx={42} cy={48} r={3.5} fill={brand.pipEye} />
+          <Circle cx={43.2} cy={46.8} r={1.2} fill="#FFFFFF" />
+          <Circle cx={64} cy={48} r={3.5} fill={brand.pipEye} />
+          <Circle cx={65.2} cy={46.8} r={1.2} fill="#FFFFFF" />
+        </>
+      )}
       <Ellipse cx={36} cy={56} rx={4.5} ry={2.5} fill={brand.pipBlush} opacity={0.65} />
       <Ellipse cx={70} cy={56} rx={4.5} ry={2.5} fill={brand.pipBlush} opacity={0.65} />
       <Path

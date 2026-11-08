@@ -4,7 +4,17 @@ import { DEFAULT_GOAL_ML } from '@/lib/goal';
 import { addDays, dateRange, toDateKey, type DateKey } from '@/lib/dates';
 import { newId } from '@/lib/id';
 
-import { daily, drinks, logs, settings, type Daily, type Log } from './schema';
+import {
+  cups,
+  daily,
+  drinks,
+  logs,
+  settings,
+  type Cup,
+  type Daily,
+  type Drink,
+  type Log,
+} from './schema';
 import { WATER_ID } from './seed';
 import type { DB } from './types';
 
@@ -172,4 +182,25 @@ export function getStreak(db: DB, now: number = Date.now()): number {
     day = addDays(day, -1);
   }
   return streak;
+}
+
+export function getCups(db: DB): Cup[] {
+  return db.select().from(cups).orderBy(asc(cups.sortOrder)).all();
+}
+
+export function getDrinks(db: DB): Drink[] {
+  return db.select().from(drinks).all();
+}
+
+const CELEBRATED_KEY = 'celebrated_date';
+
+/**
+ * True exactly once per day: the first time it's called after today's goal is met.
+ * Undoing below the goal and logging again does not celebrate twice.
+ */
+export function claimGoalCelebration(db: DB, now: number = Date.now()): boolean {
+  const today = getToday(db, now);
+  if (!today.met || getSetting(db, CELEBRATED_KEY) === today.date) return false;
+  setSetting(db, CELEBRATED_KEY, today.date);
+  return true;
 }

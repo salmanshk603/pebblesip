@@ -4,31 +4,27 @@
 > Prompt: "Read @task_today.md and do only this task. Use @prd.md and @implementation_plan.md for context."
 
 ## Goal
-Phase 4: Home / logging (see `implementation_plan.md` → Phase 4).
+Phase 5: reminders (see `implementation_plan.md` → Phase 5).
 
 ## Requirements
-- Progress ring/fill + today's total vs goal + %.
-- Skia water wave + level animation (see `animations.md`).
-- Pip as SVG with basic motion (bob, blink, sip bounce).
-- Quick-add buttons from `cups`; add-drink bottom sheet (drink + amount).
-- Undo snackbar; today's log list with swipe-to-delete.
-- Goal-met celebration (animation + haptic), once per day.
-- Respect the saved volume unit (ml/oz).
+- Schedule local notifications between wake and sleep time at the chosen interval.
+- Notification action "+250 ml" logs without opening the app.
+- Auto-pause when the goal is met; reschedule on settings change and app start.
+- **No exact-alarm permission.**
+- Battery-optimisation help screen (Xiaomi/Oppo/Vivo/Samsung guidance).
+- Premium hooks (smart pacing, quiet hours, snooze) behind a feature flag.
 
 ## Before starting
-- Primary colour decided: Stitch `#006A61` (`colors.primary`); Pastel Aqua `#7FD1C7` only as a brand accent.
-- Remove the dev-only `[db] ready` log from `app/_layout.tsx` once Home shows real data.
+- Move `REMINDER_CHANNEL_ID` from `app/(onboarding)/notifications.tsx` into `src/features/reminders`.
 
 ## Out of scope for this task
-- Reminders, widgets, stats charts, paywall, ads.
+- Fasting windows (Phase 6), widgets, stats, paywall.
 
 ## Done when
-- [ ] testing.md §2 Logging passes on the emulator (incl. survives app kill, midnight reset)
-- [ ] `implementation_plan.md` Phase 4 boxes ticked
+- [ ] testing.md §3 Reminders passes on the emulator (and ideally the phone)
+- [ ] `implementation_plan.md` Phase 5 boxes ticked
 - [ ] Audit entry written in `audit.md`
 
 ## Reference files
-- `prd.md`: §5.2 Home, §5.8 Pip
-- `animations.md`
-- `design/light/home.jpg`, `design/light/home-goal-reached.jpg`, `design/light/add-drink-sheet.jpg`, `design/dark/home.png`
-- `src/db/queries.ts`
+- `prd.md`: §5.4 Smart reminders
+- `src/db/queries.ts`, `src/features/onboarding/onboarding.ts` (wake/sleep keys)

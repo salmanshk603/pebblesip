@@ -56,12 +56,12 @@
 - [x] Notification permission request (Android 13+) with explanation screen
 
 ## Phase 4: Home / logging
-- [ ] Progress ring/fill + today total vs goal + %
-- [ ] Skia water wave + level animation (see `animations.md`)
-- [ ] Pip as SVG with basic motion (bob, blink, sip bounce); 4 mood states finished in Phase 10
-- [ ] Quick-add buttons from `cups`; add-drink bottom sheet (drink + amount)
-- [ ] Undo snackbar; today's log list with swipe-to-delete
-- [ ] Goal-met celebration (animation + haptic)
+- [x] Progress ring/fill + today total vs goal + %
+- [x] Skia water wave + level animation (see `animations.md`)
+- [x] Pip as SVG with basic motion (bob, blink, sip bounce); 4 mood states finished in Phase 10
+- [x] Quick-add buttons from `cups`; add-drink bottom sheet (drink + amount)
+- [x] Undo snackbar; today's log list with swipe-to-delete
+- [x] Goal-met celebration (animation + haptic)
 
 ## Phase 5: Reminders
 - [ ] Schedule local notifications between wake and sleep at the chosen interval

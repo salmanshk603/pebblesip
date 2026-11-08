@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import {
   addLog,
+  claimGoalCelebration,
   deleteLog,
   getGoalMl,
   getRange,
@@ -25,9 +26,10 @@ describe('migrations + seed', () => {
   it('creates the schema at the latest version and seeds defaults', () => {
     const { db, raw } = createTestDb();
     expect(raw.pragma('user_version', { simple: true })).toBe(MIGRATIONS.length);
-    expect(db.select().from(drinks).all()).toEqual([
-      expect.objectContaining({ id: 'water', factor: 1, premium: false }),
-    ]);
+    const all = db.select().from(drinks).all();
+    expect(all).toHaveLength(7);
+    expect(all.filter((d) => !d.premium).map((d) => d.id)).toEqual(['water']);
+    expect(all.find((d) => d.id === 'coffee')?.factor).toBe(0.8);
     expect(
       db
         .select()
@@ -37,12 +39,19 @@ describe('migrations + seed', () => {
     ).toEqual([150, 250, 500]);
   });
 
+  it('seed updates built-in drinks from older versions', () => {
+    const { db } = createTestDb();
+    db.update(drinks).set({ icon: 'water_drop' }).where(eq(drinks.id, 'water')).run();
+    seed(db);
+    expect(db.select().from(drinks).where(eq(drinks.id, 'water')).get()?.icon).toBe('water');
+  });
+
   it('seed is idempotent', () => {
     const { db } = createTestDb();
     seed(db);
     seed(db);
     expect(db.select().from(cups).all()).toHaveLength(3);
-    expect(db.select().from(drinks).all()).toHaveLength(1);
+    expect(db.select().from(drinks).all()).toHaveLength(7);
   });
 });
 
@@ -65,7 +74,6 @@ describe('logging', () => {
 
   it('applies the drink hydration factor to effective_ml', () => {
     const { db } = createTestDb();
-    db.insert(drinks).values({ id: 'coffee', name: 'Coffee', factor: 0.8, icon: 'coffee' }).run();
     const log = addLog(db, { amountMl: 250, drinkId: 'coffee', ts: at(2026, 11, 8) });
     expect(log.effectiveMl).toBe(200);
     expect(getToday(db, at(2026, 11, 8)).totalMl).toBe(200);
@@ -211,5 +219,28 @@ describe('getStreak', () => {
       [11, 2],
     ].forEach(([m, d]) => meet(db, 2026, m!, d!));
     expect(getStreak(db, at(2026, 11, 2))).toBe(4);
+  });
+});
+
+describe('claimGoalCelebration', () => {
+  it('fires once per day, only after the goal is met', () => {
+    const { db } = createTestDb();
+    const t = at(2026, 11, 8, 10);
+    addLog(db, { amountMl: 1000, ts: t });
+    expect(claimGoalCelebration(db, t)).toBe(false);
+    addLog(db, { amountMl: 1000, ts: t + 1 });
+    expect(claimGoalCelebration(db, t)).toBe(true);
+    expect(claimGoalCelebration(db, t)).toBe(false);
+    undoLastLog(db);
+    addLog(db, { amountMl: 1000, ts: t + 2 });
+    expect(claimGoalCelebration(db, t)).toBe(false);
+  });
+
+  it('fires again on a new day', () => {
+    const { db } = createTestDb();
+    addLog(db, { amountMl: 2000, ts: at(2026, 11, 8) });
+    expect(claimGoalCelebration(db, at(2026, 11, 8))).toBe(true);
+    addLog(db, { amountMl: 2000, ts: at(2026, 11, 9) });
+    expect(claimGoalCelebration(db, at(2026, 11, 9))).toBe(true);
   });
 });

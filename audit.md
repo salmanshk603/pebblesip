@@ -139,3 +139,54 @@
 **Actions before next phase**
 - [x] Decide the primary colour → **Stitch `#006A61`** (decided 2026-11-08). PRD Pastel Aqua `#7FD1C7` stays as `brand.pastelAqua` for accents.
 - [ ] Move `REMINDER_CHANNEL_ID` into the reminders feature in Phase 5.
+
+### Audit: Phase 4 (Home / logging), 2026-11-08
+
+**Plan items**
+| Item | Status | Notes |
+|---|---|---|
+| Progress fill + total vs goal + % | ✅ | `app/(tabs)/index.tsx`: reservoir, count-up total (~500ms), "% reached" badge (mint when met), remaining / exceeded text, Pip message by progress. Header: greeting, date, streak pill. |
+| Skia water wave + level animation | ✅ | `water-reservoir.tsx`: two sine waves, 4s drift, level eases over 600ms. Drift pauses when Home loses focus. |
+| Pip basic motion | ✅ | `animated-pip.tsx`: bob ±4px/2.5s, blink every 4s, squash & stretch on each sip. Moods are Phase 10. |
+| Quick-add + add-drink sheet | ✅ | Quick-add from `cups` with press-scale + light haptic. Sheet: drinks (premium ones locked with a hint), ±50 ml stepper (50–2,000), % of goal, cup presets. |
+| Undo snackbar + swipe-to-delete | ✅ | Snackbar slides up 200ms, hides after 4s. `ReanimatedSwipeable` rows (also a screen-reader "Delete" action); rows enter from the top and collapse on delete. |
+| Goal-met celebration | ✅ | Droplet burst (~1.2s) + success haptic, once per day via `claimGoalCelebration` (unit-tested; undo + re-cross doesn't repeat). |
+
+**testing.md §2 results (emulator, API 37)**
+| Check | Result |
+|---|---|
+| Quick-add updates total, %, fill and Pip instantly | ✅ (oz and ml) |
+| Undo removes the last entry | ✅ |
+| Swipe-to-delete removes the right entry and updates totals | ✅ 23.7 → 13.5 oz |
+| Non-water drink uses its factor (premium) | ⏸ locked until Phase 9; factor maths unit-tested (coffee 250 → 200 ml) |
+| Celebration once, not on every later log | ✅ on device + unit test |
+| Logs over 100% allowed and shown | ✅ "Goal exceeded by +450 ml" |
+| Data survives app kill and phone restart | ✅ force-stop and full emulator reboot |
+| Local midnight resets to 0; yesterday kept | ✅ clock set to 23:59 with the app open; rolled to the new day; the 8 Nov data was still there afterwards |
+| (extra) Reduce motion | ✅ with system animations off, wave/Pip/burst are static |
+
+**Bugs**
+- BUG-002 (water level drawn one step behind) found and fixed during testing. See `bugs.md`.
+
+**Deviations from plan / PRD**
+- PRD drinks (tea 0.9, coffee 0.8, milk 0.9, juice 0.9, soda 0.9, coconut 1.0) are now seeded as Premium and shown locked. `usePremium()` is a stub returning `false` until Phase 9.
+- The seed now upserts built-in drinks so name/icon/factor changes reach existing installs (found when an old `water_drop` icon showed as "?").
+- The midnight refresh polls the local date every 30s instead of one long timer, so manual clock and timezone changes are picked up too.
+- The amount slider in the add-drink design is a −/+ stepper (same as onboarding). In oz mode the step is 50 ml (~1.7 oz), which looks uneven; revisit in Phase 10 polish.
+- No bell icon in the header (no notification centre in the PRD).
+- Not yet checked in dark mode or on the physical phone.
+
+**Code health**
+- Orphaned / unused files: none. `.gitkeep` removed from `features/hydration` and `features/premium`.
+- TODOs / hard-coded values: Home copy is inline English. Quick-add labels are keyed by amount (150/250/500).
+- Type errors / lint warnings: none. 39 Jest tests pass.
+- Premium gating correct? Yes for drinks: locked in the sheet, not loggable.
+- Out-of-scope features accidentally added? No.
+- The dev-only `[db] ready` log was removed from `app/_layout.tsx`.
+
+**Test-data note**
+- The emulator DB now has logs on 9–13 Nov from the clock tests. Wipe the app data before judging Stats in Phase 8.
+
+**Actions before next phase**
+- [ ] Check Home in dark mode and on the Galaxy A31.
+- [ ] Move `REMINDER_CHANNEL_ID` into `src/features/reminders` (from the Phase 3 audit).

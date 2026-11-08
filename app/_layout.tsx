@@ -14,9 +14,10 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useEffect } from 'react';
 
-import { cups, drinks, getDb, getToday } from '@/db';
+import { getDb } from '@/db';
 
 import { useTheme } from '@/theme';
 
@@ -37,13 +38,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     // Opens the DB, runs migrations and seeds defaults on first launch.
-    const db = getDb();
-    if (__DEV__) {
-      const today = getToday(db);
-      console.log(
-        `[db] ready: ${db.select().from(drinks).all().length} drink(s), ${db.select().from(cups).all().length} cups, today ${today.totalMl}/${today.goalMl} ml`,
-      );
-    }
+    getDb();
   }, []);
 
   useEffect(() => {
@@ -53,7 +48,7 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style={theme.dark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
@@ -66,6 +61,6 @@ export default function RootLayout() {
         <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
         <Stack.Screen name="fasting" />
       </Stack>
-    </>
+    </GestureHandlerRootView>
   );
 }
