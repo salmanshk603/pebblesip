@@ -42,12 +42,12 @@
 - [x] **Widget spike:** render a "Hello" widget with react-native-android-widget in the dev build (de-risk early)
 
 ## Phase 2: Local data layer
-- [ ] Install expo-sqlite + Drizzle; create tables `settings`, `drinks`, `cups`, `logs`, `daily` (prd.md §9)
-- [ ] Migrations + seed (water drink, 3 default cups: 150/250/500)
-- [ ] Query helpers: `addLog`, `undoLastLog`, `deleteLog`, `getToday`, `getRange`, `getStreak`
-- [ ] Day boundary handling (local midnight; timezone changes)
-- [ ] Unit conversion helpers (ml ↔ oz)
-- [ ] Unit tests for goal calc, streak calc and rollups (Jest)
+- [x] Install expo-sqlite + Drizzle; create tables `settings`, `drinks`, `cups`, `logs`, `daily` (prd.md §9)
+- [x] Migrations + seed (water drink, 3 default cups: 150/250/500)
+- [x] Query helpers: `addLog`, `undoLastLog`, `deleteLog`, `getToday`, `getRange`, `getStreak`
+- [x] Day boundary handling (local midnight; timezone changes)
+- [x] Unit conversion helpers (ml ↔ oz)
+- [x] Unit tests for goal calc, streak calc and rollups (Jest)
 
 ## Phase 3: Onboarding
 - [ ] 4 steps: welcome/Pip → weight/activity/climate → wake/sleep → units

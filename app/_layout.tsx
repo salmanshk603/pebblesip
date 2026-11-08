@@ -16,6 +16,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { cups, drinks, getDb, getToday } from '@/db';
+
 import { useTheme } from '@/theme';
 
 void SplashScreen.preventAutoHideAsync();
@@ -32,6 +34,17 @@ export default function RootLayout() {
     NunitoSans_700Bold,
     NunitoSans_800ExtraBold,
   });
+
+  useEffect(() => {
+    // Opens the DB, runs migrations and seeds defaults on first launch.
+    const db = getDb();
+    if (__DEV__) {
+      const today = getToday(db);
+      console.log(
+        `[db] ready: ${db.select().from(drinks).all().length} drink(s), ${db.select().from(cups).all().length} cups, today ${today.totalMl}/${today.goalMl} ml`,
+      );
+    }
+  }, []);
 
   useEffect(() => {
     if (loaded || error) void SplashScreen.hideAsync();

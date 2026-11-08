@@ -65,3 +65,37 @@
 - [ ] Not a git repository yet. Run `git init` and make a first commit before Phase 2.
 - [ ] Decide on the canonical primary colour (Stitch `#006A61` vs PRD `#7FD1C7`).
 - [ ] Physical phone is only reliable over wireless debugging (USB link drops); use `adb connect <ip:port>`.
+
+### Audit: Phase 2 (Local data layer), 2026-11-08
+
+**Plan items**
+| Item | Status | Notes |
+|---|---|---|
+| expo-sqlite + Drizzle, 5 tables | ✅ | `src/db/schema.ts` matches prd.md §9 column for column. Indexes on `logs.date` and `logs.ts`. |
+| Migrations + seed | ✅ | `src/db/migrations.ts`: ordered SQL tracked with `PRAGMA user_version`, one transaction each. Seed: `water` (factor 1.0) + cups 150/250/500, idempotent. Verified on emulator after `pm clear`: "1 drink(s), 3 cups, today 0/2000 ml"; relaunch doesn't duplicate. |
+| Query helpers | ✅ | `addLog`, `undoLastLog`, `deleteLog`, `getToday`, `getRange`, `getStreak`, plus `setGoalMl`/`getGoalMl`, `get/setSetting`, `recomputeDaily`. Writes are transactional and keep the `daily` rollup in sync. |
+| Day boundaries | ✅ | `src/lib/dates.ts`. `logs.date` is the local day at write time, so a later timezone change never moves past entries. Calendar maths is DST-safe; tests run in `America/New_York` and cover spring-forward / fall-back days. |
+| ml ↔ oz | ✅ | `src/lib/units.ts` (US fl oz 29.5735 ml), plus kg ↔ lb for onboarding. |
+| Jest tests | ✅ | 31 tests in 3 suites: goal formula (incl. the testing.md example 70 kg/moderate/mild → 2,550 ml), units, dates, migrations/seed, logging, undo/delete, goal changes, range fill, streaks. Queries run against real SQLite (better-sqlite3, in memory) using the same migrations. |
+
+**Deviations from plan / PRD**
+- Migrations are a small hand-written runner, not `drizzle-kit` generated files. Reason: works unchanged in the app and in Node tests with no Metro/Babel `.sql` loader. Trade-off: `schema.ts` and the SQL must be kept in sync by hand. The migration/seed test exercises both.
+- Settings are stored in the `settings` table (prd.md data model) rather than MMKV/AsyncStorage. One store, transactional with logs.
+- Streak rule (my interpretation, not spelled out in the PRD): today counts once met; if today isn't met yet, the streak still counts back from yesterday.
+- Goal changes apply from today on; past days keep the goal they had (`daily.goal_ml` is a snapshot). This keeps historic "met" days stable.
+- `daily.met` is derived from the goal that applied that day. Logs over 100% are allowed; `percent` is capped at 100 for display.
+- `app/_layout.tsx` opens the DB on start and prints one `[db] ready` line in dev builds only. Remove or replace it once Home shows real data (Phase 4).
+
+**Code health**
+- Orphaned / unused files: none new. `.gitkeep`s removed from `src/db` and `src/lib`.
+- TODOs / hard-coded values: `DEFAULT_GOAL_ML = 2000` until onboarding sets a goal. DB name `pebblesip.db`.
+- Type errors / lint warnings: none. `tsc`, `expo lint`, `jest` all clean.
+- Premium gating correct? N/A. The drink `premium` flag exists; non-water drinks (P1) aren't seeded.
+- Out-of-scope features accidentally added? No.
+
+**Not covered yet (needs UI)**
+- testing.md §2 "Data survives app kill and phone restart" and the visible midnight reset: check in Phase 4 once Home can log.
+
+**Actions before next phase**
+- [ ] Keep `schema.ts` and `MIGRATIONS` in step for every schema change (append a migration, never edit v1).
+- [ ] Confirm the streak rule above with the PRD owner.
