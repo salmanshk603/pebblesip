@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Pebblesip",
+    "slug": "pebblesip",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "pebblesip",
+    "userInterfaceStyle": "automatic",
+    "android": {
+      "package": "com.salmanshaikh.pebblesip",
+      "adaptiveIcon": {
+        "backgroundColor": "#F6F1E7",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "blockedPermissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-dev-client",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F6F1E7",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120,
+          "dark": { "backgroundColor": "#121414", "image": "./assets/images/splash-icon.png" }
+        }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "Hello",
+              "label": "Pebblesip",
+              "description": "Phase 1 spike widget",
+              "minWidth": "180dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 3,
+              "targetCellHeight": 2,
+              "previewImage": "./assets/images/icon.png",
+              "updatePeriodMillis": 0
+            }
+          ]
+        }
+      ]
+    ],
+    "experiments": { "typedRoutes": true, "reactCompiler": true }
+  }
+}
