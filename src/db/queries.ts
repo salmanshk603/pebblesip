@@ -184,6 +184,25 @@ export function getStreak(db: DB, now: number = Date.now()): number {
   return streak;
 }
 
+/** Every date the goal was met, oldest first (best streak). */
+export function getMetDates(db: DB): DateKey[] {
+  return db
+    .select({ date: daily.date })
+    .from(daily)
+    .where(eq(daily.met, true))
+    .orderBy(asc(daily.date))
+    .all()
+    .map((r) => r.date);
+}
+
+/** Oldest day with a daily row, or null when nothing was ever logged. */
+export function getFirstDate(db: DB): DateKey | null {
+  return (
+    db.select({ date: daily.date }).from(daily).orderBy(asc(daily.date)).limit(1).get()?.date ??
+    null
+  );
+}
+
 export function getCups(db: DB): Cup[] {
   return db.select().from(cups).orderBy(asc(cups.sortOrder)).all();
 }

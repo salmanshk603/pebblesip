@@ -53,10 +53,10 @@
 - [x] Widget survives app update and phone restart
 
 ## 6. Stats & streaks
-- [ ] 7-day chart matches logged data
-- [ ] Streak increments when the goal is met and resets after a missed day
-- [ ] 30-day / 12-month charts and calendar (premium) are correct
-- [ ] CSV export opens the share sheet with valid data (premium)
+- [x] 7-day chart matches logged data
+- [x] Streak increments when the goal is met and resets after a missed day
+- [x] 30-day / 12-month charts and calendar (premium) are correct
+- [x] CSV export opens the share sheet with valid data (premium)
 
 ## 7. Premium & purchases
 - [ ] Paywall shows monthly / yearly / lifetime with localized prices

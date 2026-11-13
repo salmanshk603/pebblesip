@@ -6,6 +6,7 @@ import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getDb, getSetting, setSetting } from '@/db';
+import { seedSampleHistory } from '@/features/dev/sample-data';
 import { DEV_PREMIUM_KEY } from '@/features/premium/use-premium';
 import { intervalLabel, REMINDER_INTERVALS } from '@/features/reminders/plan';
 import {
@@ -16,6 +17,7 @@ import {
   type ReminderSettings,
 } from '@/features/reminders/reminders';
 import { refreshWidgets } from '@/features/widgets/widget-task-handler';
+import { emitDataChanged } from '@/lib/data-events';
 import { useTheme } from '@/theme';
 
 /** Phase 5 scope: the Reminders section. The full Settings screen is Phase 10. */
@@ -24,6 +26,7 @@ export default function SettingsScreen() {
   const [settings, setSettings] = useState<ReminderSettings>(() => getReminderSettings(getDb()));
   const [granted, setGranted] = useState<boolean | null>(null);
   const [scheduled, setScheduled] = useState<number | null>(null);
+  const [seeded, setSeeded] = useState<number | null>(null);
   const [devPremium, setDevPremium] = useState(() => getSetting(getDb(), DEV_PREMIUM_KEY) === '1');
 
   const refreshPermission = useCallback(() => {
@@ -212,6 +215,27 @@ export default function SettingsScreen() {
               }}
             />
           </View>
+        ) : null}
+        {__DEV__ ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => {
+              const n = seedSampleHistory(getDb());
+              emitDataChanged();
+              void refreshWidgets();
+              setSeeded(n);
+            }}
+            style={[
+              styles.card,
+              styles.link,
+              { backgroundColor: colors.surfaceContainer, padding: spacing.md },
+            ]}
+          >
+            <MaterialCommunityIcons name="bug-outline" size={22} color={colors.outline} />
+            <Text style={[typography.labelLg, { color: colors.onSurfaceVariant, flex: 1 }]}>
+              Dev: add 60 days of sample history{seeded !== null ? ` (${seeded} added)` : ''}
+            </Text>
+          </Pressable>
         ) : null}
       </ScrollView>
     </SafeAreaView>

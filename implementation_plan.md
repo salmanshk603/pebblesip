@@ -85,9 +85,9 @@
 - [x] Widgets gallery screen with previews + "how to add a widget" guide
 
 ## Phase 8: Stats & streaks
-- [ ] Streak counter + 7-day bar chart (free)
-- [ ] 30-day / 12-month charts, averages, best streak, calendar heatmap (premium)
-- [ ] CSV export via share sheet (premium)
+- [x] Streak counter + 7-day bar chart (free)
+- [x] 30-day / 12-month charts, averages, best streak, calendar heatmap (premium)
+- [x] CSV export via share sheet (premium)
 
 ## Phase 9: Monetization
 - [ ] RevenueCat: products monthly / yearly / lifetime; `premium` entitlement

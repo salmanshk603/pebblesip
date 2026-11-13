@@ -321,3 +321,41 @@ Not tested on the physical phone yet (Samsung battery behaviour is the real-worl
 - [ ] Real widget preview images.
 - [ ] Check widgets on the Galaxy A31 (Samsung One UI launcher, battery saver).
 - [ ] Phase 9: call `refreshWidgets()` after purchase/restore/expiry.
+
+---
+
+### Audit: Phase 8 (Stats & streaks), 2026-11-13
+
+| Item | Status | Notes |
+|---|---|---|
+| Streak counter + 7-day bar chart (free) | ✅ | `app/(tabs)/stats.tsx`. Streak card shows current and best streak. Bars coloured by met / partial / none, today outlined, dashed goal line, ✓ above met days. |
+| 30-day / 12-month charts, averages, best streak, calendar heatmap (premium) | ✅ | Week / Month / Year switch; Month and Year open the paywall for free users. Year bars = average daily intake per month. Daily average with % change vs the previous period, goals met and success rate. Monday-first heatmap of the current month (met / ≥50% / <50% / none). |
+| CSV export via share sheet (premium) | ✅ | `expo-file-system` writes `pebblesip-YYYY-MM-DD.csv` to the cache, `expo-sharing` opens the share sheet. Columns: `date,total_ml,goal_ml,goal_met`, every day from the first log to today. |
+
+Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetDates`, `getFirstDate`.
+
+**testing.md §6 results (emulator, seeded with the dev "60 days of sample history" button)**
+| Check | Result |
+|---|---|
+| 7-day chart matches logged data | ✅ Sat 2,600 · Sun 1,800 · Mon 900 · Tue–Thu 2,600 · Fri 3,800, exactly the seeded pattern; average 2,414 ml, 5/7, +8% vs previous week (hand-checked) |
+| Streak increments / resets after a missed day | ✅ 4-day streak stops at Monday's 900 ml; best 4 (hand-checked); reset case also in `queries.test.ts` |
+| 30-day / 12-month charts and calendar (premium) | ✅ 22/30 met (8 seeded misses), heatmap colours match each day, Year shows Sep (partial), Oct, Nov |
+| CSV export (premium) | ✅ share sheet opens with the file; contents checked on the device: header + 61 rows matching the seed |
+| Free user | ✅ Month/Year, calendar colours and CSV locked; each opens the paywall |
+
+**Deviations / decisions**
+- Bar growth and flame flicker animations are left for Phase 10 (Polish), as `animations.md` plans.
+- No ad slot on Stats yet (Phase 9).
+- Year averages only count days since the first log, so the months before install don't drag the average down.
+- CSV is always in ml (spreadsheet-friendly), whatever the display unit.
+- Dev-only Settings button "add 60 days of sample history" (`src/features/dev/sample-data.ts`, `__DEV__` only). It skips days that already have logs.
+- Fixed while testing: calendar header wrapping and off-centre numbers (rows of 7 instead of a wrapping grid); truncated Month labels; a free user could keep the Month view if Premium was lost while it was selected (now forced back to Week).
+
+**Code health**
+- Type errors / lint warnings: none. 69 Jest tests pass.
+- Premium gating correct? Yes.
+- Out-of-scope features accidentally added? No.
+
+**Actions before next phase**
+- [ ] Emulator now has 60 days of sample data; wipe app data before screenshots or store assets.
+- [ ] Check Stats on the Galaxy A31.
