@@ -1,13 +1,14 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getPermissionsAsync, requestPermissionsAsync } from 'expo-notifications';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getDb, getSetting, setSetting } from '@/db';
 import { seedSampleHistory } from '@/features/dev/sample-data';
-import { DEV_PREMIUM_KEY } from '@/features/premium/use-premium';
+import { privacyOptionsRequired, showPrivacyOptions } from '@/features/ads/ads';
+import { DEV_PREMIUM_KEY, notifyPremiumChanged, usePremium } from '@/features/premium/use-premium';
 import { intervalLabel, REMINDER_INTERVALS } from '@/features/reminders/plan';
 import {
   getReminderSettings,
@@ -26,6 +27,11 @@ export default function SettingsScreen() {
   const [settings, setSettings] = useState<ReminderSettings>(() => getReminderSettings(getDb()));
   const [granted, setGranted] = useState<boolean | null>(null);
   const [scheduled, setScheduled] = useState<number | null>(null);
+  const premium = usePremium();
+  const [privacyRequired, setPrivacyRequired] = useState(false);
+  useEffect(() => {
+    void privacyOptionsRequired().then(setPrivacyRequired);
+  }, []);
   const [seeded, setSeeded] = useState<number | null>(null);
   const [devPremium, setDevPremium] = useState(() => getSetting(getDb(), DEV_PREMIUM_KEY) === '1');
 
@@ -62,6 +68,26 @@ export default function SettingsScreen() {
         >
           Settings
         </Text>
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/paywall')}
+          style={[
+            styles.card,
+            styles.link,
+            { backgroundColor: colors.secondaryContainer, padding: spacing.md },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name="star-four-points-outline"
+            size={22}
+            color={colors.primary}
+          />
+          <Text style={[typography.labelLg, { color: colors.onSecondaryContainer, flex: 1 }]}>
+            {premium ? 'Pebblesip Premium: active' : 'Get Pebblesip Premium'}
+          </Text>
+          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.outline} />
+        </Pressable>
 
         <Text style={label}>Reminders</Text>
         <View
@@ -176,6 +202,28 @@ export default function SettingsScreen() {
           <MaterialCommunityIcons name="chevron-right" size={22} color={colors.outline} />
         </Pressable>
 
+        {privacyRequired ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void showPrivacyOptions()}
+            style={[
+              styles.card,
+              styles.link,
+              { backgroundColor: colors.surfaceContainerLowest, padding: spacing.md },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="shield-account-outline"
+              size={22}
+              color={colors.primary}
+            />
+            <Text style={[typography.labelLg, { color: colors.onSurface, flex: 1 }]}>
+              Ad privacy choices
+            </Text>
+            <MaterialCommunityIcons name="chevron-right" size={22} color={colors.outline} />
+          </Pressable>
+        ) : null}
+
         {__DEV__ ? (
           <Pressable
             accessibilityRole="button"
@@ -210,6 +258,7 @@ export default function SettingsScreen() {
               onValueChange={(v) => {
                 setSetting(getDb(), DEV_PREMIUM_KEY, v ? '1' : '0');
                 setDevPremium(v);
+                notifyPremiumChanged();
                 void syncReminders().then(setScheduled);
                 void refreshWidgets();
               }}

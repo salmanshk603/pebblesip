@@ -1,5 +1,4 @@
-import { getSetting, setSetting } from '@/db';
-import { getCups, getToday } from '@/db/queries';
+import { getCups, getSetting, getToday, setSetting } from '@/db/queries';
 import type { DB } from '@/db/types';
 import { KEYS as ONBOARDING_KEYS } from '@/features/onboarding/onboarding';
 import type { VolumeUnit } from '@/lib/units';
@@ -12,7 +11,34 @@ import {
   type WidgetThemeId,
 } from './themes';
 
-export const WIDGET_KEYS = { theme: 'widget_theme', accent: 'widget_accent' } as const;
+export const WIDGET_KEYS = {
+  theme: 'widget_theme',
+  accent: 'widget_accent',
+  trial: 'widget_theme_trial',
+} as const;
+export const TRIAL_MS = 24 * 60 * 60 * 1000;
+
+/** A Premium theme unlocked for 24 h by a rewarded ad. */
+export interface ThemeTrial {
+  theme: WidgetThemeId;
+  until: number;
+}
+
+export function getThemeTrial(db: DB, now = Date.now()): ThemeTrial | null {
+  try {
+    const t = JSON.parse(getSetting(db, WIDGET_KEYS.trial) ?? 'null') as ThemeTrial | null;
+    if (!t || !(WIDGET_THEME_IDS as readonly string[]).includes(t.theme)) return null;
+    return t.until > now ? t : null;
+  } catch {
+    return null;
+  }
+}
+
+export function startThemeTrial(db: DB, theme: WidgetThemeId, now = Date.now()): ThemeTrial {
+  const t = { theme, until: now + TRIAL_MS };
+  setSetting(db, WIDGET_KEYS.trial, JSON.stringify(t));
+  return t;
+}
 
 export interface WidgetPrefs {
   theme: WidgetThemeId;
@@ -62,7 +88,11 @@ export function getWidgetData(db: DB, premium: boolean, now = Date.now()): Widge
     pct: today.goalMl > 0 ? Math.min(100, Math.round((today.totalMl / today.goalMl) * 100)) : 0,
     unit: getSetting(db, ONBOARDING_KEYS.volumeUnit) === 'oz' ? 'oz' : 'ml',
     lastTs,
-    theme: resolveTheme(prefs.theme, prefs.accent, premium),
+    // A rewarded-ad trial unlocks that one theme (no accent) until it expires.
+    theme:
+      !premium && getThemeTrial(db, now)?.theme === prefs.theme
+        ? resolveTheme(prefs.theme, null, true)
+        : resolveTheme(prefs.theme, prefs.accent, premium),
     cupsMl: getCups(db)
       .slice(0, 3)
       .map((c) => c.amountMl),

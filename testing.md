@@ -61,16 +61,16 @@
 ## 7. Premium & purchases
 - [ ] Paywall shows monthly / yearly / lifetime with localized prices
 - [ ] Purchase (license tester) unlocks premium immediately
-- [ ] Ads disappear after purchase
+- [x] Ads disappear after purchase
 - [ ] Restore purchases works after reinstall
 - [ ] Cancelled/expired subscription relocks premium features
 - [ ] Lifetime purchase never expires
 
 ## 8. Ads
-- [ ] Free users see the banner only on Stats (never on Home, never interstitial after logging)
-- [ ] Rewarded ad unlocks a theme for 24h, then relocks
+- [x] Free users see the banner only on Stats (never on Home, never interstitial after logging)
+- [x] Rewarded ad unlocks a theme for 24h, then relocks
 - [ ] EEA/UK consent form shows on first launch (test with UMP debug geography)
-- [ ] Test ad unit IDs used in dev; real IDs only in production builds
+- [x] Test ad unit IDs used in dev; real IDs only in production builds
 
 ## 9. Settings & data
 - [ ] All settings persist after restart

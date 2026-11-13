@@ -359,3 +359,44 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 **Actions before next phase**
 - [ ] Emulator now has 60 days of sample data; wipe app data before screenshots or store assets.
 - [ ] Check Stats on the Galaxy A31.
+
+---
+
+### Audit: Phase 9 (Monetization), 2026-11-13: code complete, purchases not yet testable
+
+| Item | Status | Notes |
+|---|---|---|
+| RevenueCat products + `premium` entitlement | ⏳ code ready | `src/features/premium/purchases.ts`: configure, offerings → plans (yearly/monthly/lifetime by package type, localized `priceString`, free-trial label from the intro offer), purchase, restore, customer-info listener. Entitlement cached in settings (`premium_active`) so widgets, reminders and offline starts know it; changes re-sync reminders and widgets. Needs the RevenueCat key + Play products (`docs/monetization-setup.md`). |
+| Paywall (after onboarding, locked features, Settings) + restore | ✅ | `app/paywall.tsx` per design. Without RevenueCat it shows the PRD prices and "Purchases aren't set up in this build yet" with the button disabled. Entry points: end of onboarding, every locked feature, Settings → "Get Pebblesip Premium". |
+| `usePremium()` gating | ✅ | Now reactive (`useSyncExternalStore`). Everything re-renders immediately when Premium changes. |
+| AdMob banner (Stats only) + rewarded 24 h theme trial | ✅ | `StatsBanner` (adaptive) only on Stats, only for free users with consent. Rewarded: tapping a locked widget theme → "Try 24h (watch ad)" / "Get Premium". Trial stored as `widget_theme_trial`; widgets and gallery honour it; accent not included. |
+| UMP consent (EEA/UK) | ⏳ code ready | `AdsConsent.gatherConsent()` on every start before the SDK; ads only if `canRequestAds`. "Ad privacy choices" row in Settings when required. Not yet seen in EEA mode (needs the GDPR message published in AdMob + a test device hash). |
+| License testers + test ad units | ½ | Test ad units ✅ (dev builds always use `TestIds`; real IDs only from env in production). License testers ⏳ (needs Play Console). |
+
+**testing.md results (emulator, dev build, Google test ads)**
+| Check | Result |
+|---|---|
+| §8 Banner only on Stats | ✅ "Test Ad · AdMob Adaptive Banner" at the bottom of Stats; none on Home or anywhere else; no interstitials exist |
+| §8 Rewarded ad unlocks a theme for 24 h, then relocks | ✅ watched the test rewarded ad → "Reward granted" → Ocean applied to both home-screen widgets and shown as "Ocean · 24h trial"; clock +25 h → widgets back to Pastel Aqua |
+| §8 Test IDs in dev | ✅ manifest has Google's sample app ID; units come from `TestIds` under `__DEV__` |
+| §7 Ads disappear with Premium | ✅ via the dev "Pretend Premium" switch (same code path as a real entitlement change): banner gone, calendar and CSV unlocked instantly |
+| §7 Localized prices, purchase, restore, expiry, lifetime | ⏳ need Play Console + RevenueCat |
+| §8 EEA consent form | ⏳ see above |
+
+**Bugs found and fixed while testing**
+- `usePremium()` returned a stale value. The React Compiler memoized the bare `isPremium()` call (no reactive inputs), so toggling Premium didn't update open screens. Now read through `useSyncExternalStore`. Same issue for the gallery's trial theme (now state). Rule: don't read SQLite/settings in a render body without a reactive source.
+
+**Deviations / decisions**
+- "Smart reminders that adapt to you" from the paywall design is not listed: those reminder extras are still behind `FEATURE_FLAGS.premiumReminders` (off).
+- Terms / Privacy links on the paywall wait for the hosted pages (Phase 10 compliance).
+- Production AdMob app ID is injected by `app.config.js` from `ADMOB_ANDROID_APP_ID`; `.env.example` lists all keys.
+- Paywall after onboarding was wired (`/paywall?from=onboarding`, close → Home) but not re-run on the emulator, because onboarding is already complete there.
+
+**Code health**
+- Type errors / lint warnings: none. 70 Jest tests pass (new: theme-trial expiry).
+- Out-of-scope features accidentally added? No.
+
+**Actions before the phase can be closed**
+- [ ] Do `docs/monetization-setup.md` steps 1–4 (Play Console, RevenueCat, AdMob, `.env.local`).
+- [ ] Run testing.md §7 with a license tester; §8 EEA consent with debug geography.
+- [ ] Re-run onboarding once to see the paywall step.

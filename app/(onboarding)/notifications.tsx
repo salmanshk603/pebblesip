@@ -21,7 +21,8 @@ export default function NotificationsScreen() {
   const finish = () => {
     completeOnboarding(getDb(), draft);
     void syncReminders();
-    router.replace('/');
+    // PRD flow: paywall (dismissible) after onboarding, then Home.
+    router.replace({ pathname: '/paywall', params: { from: 'onboarding' } });
   };
 
   const allow = async () => {

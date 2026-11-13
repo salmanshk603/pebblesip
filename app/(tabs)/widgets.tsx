@@ -1,12 +1,21 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { requestPinWidget, WidgetPreview } from 'react-native-android-widget';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
 import { getDb } from '@/db';
+import { showRewardedAd } from '@/features/ads/theme-trial';
 import { usePremium } from '@/features/premium/use-premium';
 import {
   ACCENT_COLORS,
@@ -22,8 +31,10 @@ import {
   SmallWaterWidget,
 } from '@/features/widgets/water-widgets';
 import {
+  getThemeTrial,
   getWidgetData,
   getWidgetPrefs,
+  startThemeTrial,
   setWidgetPrefs,
   type WidgetData,
   type WidgetPrefs,
@@ -45,10 +56,13 @@ export default function WidgetsScreen() {
   const [data, setData] = useState<WidgetData>(() => getWidgetData(getDb(), premium));
   const [showSteps, setShowSteps] = useState(false);
   const [pinMsg, setPinMsg] = useState<string | null>(null);
+  // State, not a render-time read: the React Compiler would memoize a bare call.
+  const [trialTheme, setTrialTheme] = useState(() => getThemeTrial(getDb())?.theme ?? null);
 
   useFocusEffect(
     useCallback(() => {
       setData(getWidgetData(getDb(), premium));
+      setTrialTheme(getThemeTrial(getDb())?.theme ?? null);
     }, [premium]),
   );
 
@@ -58,8 +72,28 @@ export default function WidgetsScreen() {
     setData(getWidgetData(getDb(), premium));
     void refreshWidgets();
   };
+  const tryWithAd = async (id: WidgetThemeId) => {
+    const r = await showRewardedAd();
+    if (r === 'earned') {
+      startThemeTrial(getDb(), id);
+      setTrialTheme(id);
+      save({ ...prefs, theme: id });
+    } else if (r === 'unavailable') {
+      Alert.alert(
+        'No ad available',
+        'Please try again later, or get Premium to unlock every theme.',
+      );
+    }
+  };
   const pickTheme = (id: WidgetThemeId) => {
-    if (WIDGET_THEMES[id].premium && !premium) return router.push('/paywall');
+    if (WIDGET_THEMES[id].premium && !premium && trialTheme !== id) {
+      // Free users: Premium, or watch one rewarded ad to try this theme for 24 h.
+      return Alert.alert(WIDGET_THEMES[id].name, 'This is a Premium theme.', [
+        { text: 'Not now', style: 'cancel' },
+        { text: 'Try 24h (watch ad)', onPress: () => void tryWithAd(id) },
+        { text: 'Get Premium', onPress: () => router.push('/paywall') },
+      ]);
+    }
     save({ ...prefs, theme: id });
   };
   const pickAccent = (c: string | null) => {
@@ -76,7 +110,7 @@ export default function WidgetsScreen() {
 
   const cardW = (width - spacing.margin * 2 - spacing.md) / 2;
   const previewW = Math.round(cardW - 24);
-  const active = resolveTheme(prefs.theme, prefs.accent, premium);
+  const active = data.theme;
 
   return (
     <SafeAreaView edges={['top']} style={[styles.root, { backgroundColor: colors.background }]}>
@@ -151,8 +185,9 @@ export default function WidgetsScreen() {
         <View style={styles.grid} accessibilityRole="radiogroup">
           {WIDGET_THEME_IDS.map((id) => {
             const t = WIDGET_THEMES[id];
-            const on = prefs.theme === id && (!t.premium || premium);
-            const locked = t.premium && !premium;
+            const unlocked = !t.premium || premium || trialTheme === id;
+            const on = prefs.theme === id && unlocked;
+            const locked = !unlocked;
             return (
               <Pressable
                 key={id}
@@ -187,6 +222,7 @@ export default function WidgetsScreen() {
                 <View style={styles.rowBetween}>
                   <Text style={[typography.labelLg, { color: colors.onSurface, flex: 1 }]}>
                     {t.name}
+                    {!premium && trialTheme === id ? ' · 24h trial' : ''}
                   </Text>
                   {on ? (
                     <MaterialCommunityIcons name="check-circle" size={20} color={colors.primary} />

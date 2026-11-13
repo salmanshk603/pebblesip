@@ -9,6 +9,9 @@ Phase 9: monetization (see `implementation_plan.md` → Phase 9).
 ## Requirements
 - See `implementation_plan.md` → Phase 9 and `prd.md` (monetization section) for the full list.
 
+## Status (2026-11-13)
+- Code complete. Waiting on accounts: follow `docs/monetization-setup.md`, then run testing.md §7 and the EEA consent check.
+
 ## Notes
 - Replace the `usePremium()` / `isPremium()` stub with the real entitlement; keep the dev "Pretend Premium" switch dev-only.
 - After purchase, restore or expiry: call `syncReminders()` and `refreshWidgets()` so reminders and widgets pick up Premium.

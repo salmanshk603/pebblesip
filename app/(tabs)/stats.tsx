@@ -22,6 +22,7 @@ import {
   summarize,
   toCsv,
 } from '@/features/stats/stats';
+import { StatsBanner } from '@/features/ads/stats-banner';
 import { onDataChanged } from '@/lib/data-events';
 import { addDays, fromDateKey, todayKey } from '@/lib/dates';
 import { formatVolume, type VolumeUnit } from '@/lib/units';
@@ -379,6 +380,7 @@ export default function StatsScreen() {
           />
         </Pressable>
         {csvMsg ? <Text style={[typography.bodySm, { color: colors.error }]}>{csvMsg}</Text> : null}
+        <StatsBanner />
       </ScrollView>
     </SafeAreaView>
   );

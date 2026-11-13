@@ -91,9 +91,9 @@
 
 ## Phase 9: Monetization
 - [ ] RevenueCat: products monthly / yearly / lifetime; `premium` entitlement
-- [ ] Paywall screen (after onboarding, on locked features, in settings); restore purchases
-- [ ] `usePremium()` hook gating all premium features
-- [ ] AdMob: banner on Stats only (free users); rewarded ad "try a theme for 24h"
+- [x] Paywall screen (after onboarding, on locked features, in settings); restore purchases
+- [x] `usePremium()` hook gating all premium features
+- [x] AdMob: banner on Stats only (free users); rewarded ad "try a theme for 24h"
 - [ ] UMP consent flow (EEA/UK)
 - [ ] Test with license testers + test ad units
 
