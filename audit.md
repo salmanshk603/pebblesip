@@ -138,7 +138,7 @@
 
 **Actions before next phase**
 - [x] Decide the primary colour → **Stitch `#006A61`** (decided 2026-11-08). PRD Pastel Aqua `#7FD1C7` stays as `brand.pastelAqua` for accents.
-- [ ] Move `REMINDER_CHANNEL_ID` into the reminders feature in Phase 5.
+- [x] Move `REMINDER_CHANNEL_ID` into the reminders feature (done in Phase 5).
 
 ### Audit: Phase 4 (Home / logging), 2026-11-08
 
@@ -189,4 +189,49 @@
 
 **Actions before next phase**
 - [ ] Check Home in dark mode and on the Galaxy A31.
-- [ ] Move `REMINDER_CHANNEL_ID` into `src/features/reminders` (from the Phase 3 audit).
+- [x] Move `REMINDER_CHANNEL_ID` into `src/features/reminders` (done in Phase 5).
+
+### Audit: Phase 5 (Reminders), 2026-11-13
+
+**Plan items**
+| Item | Status | Notes |
+|---|---|---|
+| Notifications between wake and sleep at the chosen interval | ✅ | `src/features/reminders/plan.ts` (pure, tested) + `reminders.ts`. One-off date triggers for today and the next 2 days; first at wake time, none at or after bedtime; windows past midnight supported. Intervals 30/60/90/120 min, default 60. |
+| "+250 ml" action logs without opening the app | ✅ | Category button with `opensAppToForeground: false`. Foreground: response listener in `app/_layout.tsx`. Background/killed: `TaskManager` task registered in `index.ts`. Presses are de-duplicated (last 30 ids) so a press is never logged twice. |
+| Auto-pause when goal met; reschedule on settings change and app start | ✅ | `syncReminders()` runs on app start, after onboarding, after every add/undo/delete, after an action press, and on settings changes. Overlapping calls coalesce. |
+| No exact-alarm permission | ✅ | Both permissions blocked in `app.json`; not in the installed package. expo-notifications falls back to inexact `setAndAllowWhileIdle`. |
+| Battery-optimisation help | ✅ | `app/battery-help.tsx`: this phone's brand first (via `expo-device`), Xiaomi/Samsung/Oppo/Vivo/other steps, button opens the system battery-optimisation list (no extra permission). |
+| Premium hooks behind a flag | ✅ | `FEATURE_FLAGS.premiumReminders` (off) + `usePremium()`. Planner supports quiet hours and smart pacing (gap shrinks to at most half when behind; tested); snooze 15 min action. |
+
+**testing.md §3 results (emulator, API 37)**
+| Check | Result |
+|---|---|
+| Fire only between wake and sleep | ✅ AlarmManager dump: hourly 07:00–22:00, nothing at 23:00, 44 alarms over 3 days |
+| Interval change reschedules | ✅ 1 h → 2 h: 44 → 22, odd hours only |
+| "+250 ml" logs without opening the app | ✅ app in background (shade stayed open, notification dismissed, +250 ml) and app process killed (headless task ran; opening the app showed one log, no duplicate) |
+| Stop for the day after goal met | ✅ after 2,650 / 2,550 ml: no alarms left today |
+| Resume next morning | ✅ next alarm 14 Nov 07:00 |
+| Still work after reboot | ✅ emulator cold boot, app not opened: all 16 alarms back (expo-notifications boot receiver) |
+| Turning off cancels everything | ✅ 16 → 0, back to 16 when on |
+| No exact-alarm permission in manifest | ✅ |
+
+Not tested on the physical phone yet (Samsung battery behaviour is the real-world risk).
+
+**Deviations / decisions**
+- Rolling 3-day schedule instead of repeating triggers, so "pause for today" works. Downside: if the app isn't opened (and nothing is logged) for 3 days, reminders stop until it is. Phase 7 widget logging also reschedules, which helps.
+- Inexact alarms can arrive a few minutes late, especially in Doze. That's expected without the exact-alarm permission.
+- Reminders switch defaults to on; the toggle asks for notification permission if it's missing. Denied permission shows a link to system settings.
+- `src/lib/data-events.ts`: tiny listener so Home refreshes when a notification action logs while the app is open.
+- Settings tab now contains only the Reminders section plus a dev-only "send test reminder in 5 s" button (`__DEV__` only). The full Settings screen is Phase 10.
+- iOS bundle id added earlier for simulator dev builds; iOS stays out of v1 scope.
+
+**Code health**
+- Orphaned / unused files: none. `.gitkeep` removed from `features/reminders`.
+- TODOs / hard-coded values: reminder messages are inline English; "+250 ml" amount is fixed per the PRD.
+- Type errors / lint warnings: none. 50 Jest tests pass (9 planner, 2 battery guide new).
+- Premium gating correct? Yes: extras need the flag and Premium; both are off.
+- Out-of-scope features accidentally added? No.
+
+**Actions before next phase**
+- [ ] Check reminders and the background action on the Galaxy A31 (wireless debugging).
+- [ ] Fasting mode (Phase 6) must plug into `planReminders` as a different window.

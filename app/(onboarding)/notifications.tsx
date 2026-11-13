@@ -1,21 +1,16 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import {
-  AndroidImportance,
-  requestPermissionsAsync,
-  setNotificationChannelAsync,
-} from 'expo-notifications';
+import { requestPermissionsAsync } from 'expo-notifications';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { getDb } from '@/db';
 import { useDraft } from '@/features/onboarding/draft-context';
 import { completeOnboarding } from '@/features/onboarding/onboarding';
 import { OnboardingShell } from '@/features/onboarding/onboarding-shell';
+import { ensureReminderChannel, syncReminders } from '@/features/reminders/reminders';
 import { useTheme } from '@/theme';
-
-export const REMINDER_CHANNEL_ID = 'reminders';
 
 export default function NotificationsScreen() {
   const { colors, typography, spacing } = useTheme();
@@ -25,6 +20,7 @@ export default function NotificationsScreen() {
 
   const finish = () => {
     completeOnboarding(getDb(), draft);
+    void syncReminders();
     router.replace('/');
   };
 
@@ -32,12 +28,7 @@ export default function NotificationsScreen() {
     setBusy(true);
     try {
       // Android 13+ only shows the system prompt once a channel exists.
-      if (Platform.OS === 'android') {
-        await setNotificationChannelAsync(REMINDER_CHANNEL_ID, {
-          name: 'Water reminders',
-          importance: AndroidImportance.DEFAULT,
-        });
-      }
+      await ensureReminderChannel(draft.volumeUnit);
       const { granted } = await requestPermissionsAsync();
       if (granted) finish();
       else setDenied(true);

@@ -18,6 +18,8 @@ import {
   type Log,
   type Today,
 } from '@/db';
+import { syncReminders } from '@/features/reminders/reminders';
+import { onDataChanged } from '@/lib/data-events';
 import { todayKey } from '@/lib/dates';
 import type { VolumeUnit } from '@/lib/units';
 
@@ -47,6 +49,8 @@ export function useHydration() {
 
   useFocusEffect(refresh);
 
+  useEffect(() => onDataChanged(refresh), [refresh]);
+
   useEffect(() => {
     const sub = AppState.addEventListener('change', (s) => s === 'active' && refresh());
     return () => sub.remove();
@@ -67,6 +71,7 @@ export function useHydration() {
       const log = addLog(db, { amountMl, drinkId });
       const celebrate = claimGoalCelebration(db);
       refresh();
+      void syncReminders(); // auto-pause once the goal is met
       return { log, celebrate };
     },
     [refresh],
@@ -75,12 +80,14 @@ export function useHydration() {
   const undo = useCallback(() => {
     undoLastLog(getDb());
     refresh();
+    void syncReminders();
   }, [refresh]);
 
   const remove = useCallback(
     (id: string) => {
       deleteLog(getDb(), id);
       refresh();
+      void syncReminders();
     },
     [refresh],
   );

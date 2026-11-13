@@ -64,12 +64,12 @@
 - [x] Goal-met celebration (animation + haptic)
 
 ## Phase 5: Reminders
-- [ ] Schedule local notifications between wake and sleep at the chosen interval
-- [ ] Notification action "+250 ml" logs without opening the app
-- [ ] Auto-pause when goal met; reschedule on settings change and app start
-- [ ] **No exact-alarm permission**
-- [ ] Battery-optimisation help screen (Xiaomi/Oppo/Vivo/Samsung guidance)
-- [ ] Premium hooks (smart pacing, quiet hours, snooze), gated by a feature flag
+- [x] Schedule local notifications between wake and sleep at the chosen interval
+- [x] Notification action "+250 ml" logs without opening the app
+- [x] Auto-pause when goal met; reschedule on settings change and app start
+- [x] **No exact-alarm permission**
+- [x] Battery-optimisation help screen (Xiaomi/Oppo/Vivo/Samsung guidance)
+- [x] Premium hooks (smart pacing, quiet hours, snooze), gated by a feature flag
 
 ## Phase 6: Fasting mode
 - [ ] Manual eating window (free); reminders only inside the window; goal spread across the window

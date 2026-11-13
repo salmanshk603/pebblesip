@@ -17,7 +17,10 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useEffect } from 'react';
 
+import { addNotificationResponseReceivedListener } from 'expo-notifications';
+
 import { getDb } from '@/db';
+import { handleReminderAction, syncReminders } from '@/features/reminders/reminders';
 
 import { useTheme } from '@/theme';
 
@@ -39,6 +42,11 @@ export default function RootLayout() {
   useEffect(() => {
     // Opens the DB, runs migrations and seeds defaults on first launch.
     getDb();
+    // Reschedule on every app start (settings, timezone or a day may have changed).
+    void syncReminders();
+    // "+250 ml" pressed while the app is in the foreground.
+    const sub = addNotificationResponseReceivedListener((r) => void handleReminderAction(r));
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {
@@ -60,6 +68,7 @@ export default function RootLayout() {
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
         <Stack.Screen name="fasting" />
+        <Stack.Screen name="battery-help" />
       </Stack>
     </GestureHandlerRootView>
   );

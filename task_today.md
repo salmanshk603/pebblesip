@@ -4,27 +4,26 @@
 > Prompt: "Read @task_today.md and do only this task. Use @prd.md and @implementation_plan.md for context."
 
 ## Goal
-Phase 5: reminders (see `implementation_plan.md` → Phase 5).
+Phase 6: fasting mode (see `implementation_plan.md` → Phase 6).
 
 ## Requirements
-- Schedule local notifications between wake and sleep time at the chosen interval.
-- Notification action "+250 ml" logs without opening the app.
-- Auto-pause when the goal is met; reschedule on settings change and app start.
-- **No exact-alarm permission.**
-- Battery-optimisation help screen (Xiaomi/Oppo/Vivo/Samsung guidance).
-- Premium hooks (smart pacing, quiet hours, snooze) behind a feature flag.
+- Manual eating window (free): reminders only inside the window; goal spread across the window.
+- IF presets 16:8 / 18:6 / 20:4 / OMAD (Premium).
+- Ramadan mode: `adhan` prayer times from coarse location or a manual city; method selector (Premium).
+- Suhoor pre-dawn reminder sequence (Premium).
 
-## Before starting
-- Move `REMINDER_CHANNEL_ID` from `app/(onboarding)/notifications.tsx` into `src/features/reminders`.
+## Notes
+- Reminder windows come from `src/features/reminders/plan.ts` (`planReminders`); fasting supplies a different window. Windows crossing midnight are already supported.
+- Location must be optional and coarse; the app must work with it denied (manual city).
 
 ## Out of scope for this task
-- Fasting windows (Phase 6), widgets, stats, paywall.
+- Widgets, stats, paywall (Premium parts stay behind `usePremium()` / feature flags).
 
 ## Done when
-- [ ] testing.md §3 Reminders passes on the emulator (and ideally the phone)
-- [ ] `implementation_plan.md` Phase 5 boxes ticked
+- [ ] testing.md §4 Fasting mode passes on the emulator
+- [ ] `implementation_plan.md` Phase 6 boxes ticked
 - [ ] Audit entry written in `audit.md`
 
 ## Reference files
-- `prd.md`: §5.4 Smart reminders
-- `src/db/queries.ts`, `src/features/onboarding/onboarding.ts` (wake/sleep keys)
+- `prd.md`: §5.5 Fasting mode
+- `design/light/fasting.jpg`
