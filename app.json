@@ -60,6 +60,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "ios": {
+      "bundleIdentifier": "com.salmanshaikh.pebblesip"
     }
   }
 }
