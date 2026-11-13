@@ -30,6 +30,23 @@ _None._
 
 ## Fixed
 
+### BUG-003: Widgets keep yesterday's total after midnight when the app is closed
+- **Status:** Fixed (2026-11-13)
+- **Severity:** Medium (wrong numbers on the home screen for up to ~50 min; logging still goes to the right day)
+- **Device / Android version:** Emulator Medium_Phone_API_37.0
+- **Build:** 0.1.0 dev client, Phase 7 work in progress
+- **Steps to reproduce:**
+  1. Place the small and wide widgets. Log some water.
+  2. Close the app (Home). Let the clock pass midnight (tested with `cmd alarm set-time` 23:59:30).
+- **Expected:** both widgets reset to 0% shortly after midnight.
+- **What happens:** at 00:00:23 both still show 3,050 ml / 100% and "Last drink 11:21".
+- **Error / logs:** `dumpsys alarm`: the only widget refresh is the system `APPWIDGET_UPDATE` repeat (`repeatInterval=1800000`, `window=+22m30s`), elapsed-time based, next in ~27 min.
+- **Files involved:** `app.json` (widget `updatePeriodMillis`), `src/features/widgets/widget-task-handler.tsx`
+- **Hypothesis:** nothing tells the widgets the day changed. The app's 30 s date poll only runs while the app is open, and Android's periodic widget update is at most every 30 min, inexact and not tied to the clock. Midnight sends no broadcast an app can receive while closed (`ACTION_DATE_CHANGED` is not exempt from implicit-broadcast limits).
+- **Fix:** `plugins/with-widget-midnight.js` generates `WidgetMidnightReceiver.kt` and registers it. One inexact `setWindow(RTC_WAKEUP, 00:01, 10 min)` alarm per night (no exact-alarm permission; `setAndAllowWhileIdle` was tried first but Android gave it a 1-hour window). It sends `APPWIDGET_UPDATE` to both providers and re-arms. It is re-armed on boot, time/timezone change, app update and every app process start (`MainApplication.onCreate`), and cancelled when no widgets are placed. Verified on the emulator with the app closed: 23:59:30 → widgets at 0% at 00:06; alarm re-armed for the next night; re-armed after a cold boot. Note: in the **dev** build, widgets are blank after a reboot until Metro is reachable (`Unable to load script`); the release build renders them straight away.
+- **Fix plan (as approved):** add a small native piece through an Expo config plugin (`plugins/with-widget-midnight.js`): a `BroadcastReceiver` that sets one **inexact** `setAndAllowWhileIdle(RTC_WAKEUP, nextMidnight + 1 min)` alarm (no exact-alarm permission). When it fires it sends `APPWIDGET_UPDATE` to both widget providers (the JS task handler then redraws from SQLite) and schedules the next midnight. It is (re)scheduled on `BOOT_COMPLETED`, `TIME_SET`, `TIMEZONE_CHANGED`, app update (`MY_PACKAGE_REPLACED`) and whenever a widget is added. Keep `updatePeriodMillis` (30 min) as a backstop. Re-test: clock to 23:59:30 with the app closed; widgets show 0% within ~2 min; still works after a reboot.
+
+
 ### BUG-002: Home water level is drawn one step behind
 - **Status:** Fixed (2026-11-08)
 - **Severity:** Medium (wrong visual; numbers are right)

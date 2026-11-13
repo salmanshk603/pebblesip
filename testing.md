@@ -44,13 +44,13 @@
 - [x] Turning fasting mode off restores normal reminders
 
 ## 5. Widgets
-- [ ] Small and medium widgets can be added from the launcher
-- [ ] Widget "+250 ml" logs and refreshes within ~1s
-- [ ] Logging in the app updates the widget
-- [ ] Widget resets after midnight
-- [ ] Free user: only the free theme applies; premium themes show as locked
-- [ ] Premium user: all themes + custom accent work
-- [ ] Widget survives app update and phone restart
+- [x] Small and medium widgets can be added from the launcher
+- [x] Widget "+250 ml" logs and refreshes within ~1s
+- [x] Logging in the app updates the widget
+- [x] Widget resets after midnight
+- [x] Free user: only the free theme applies; premium themes show as locked
+- [x] Premium user: all themes + custom accent work
+- [x] Widget survives app update and phone restart
 
 ## 6. Stats & streaks
 - [ ] 7-day chart matches logged data

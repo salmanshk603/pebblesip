@@ -278,3 +278,46 @@ Not tested on the physical phone yet (Samsung battery behaviour is the real-worl
 **Actions before next phase**
 - [ ] Check fasting reminders on the Galaxy A31.
 - [ ] Emulator adb server crashes during a streamed `adb install` of the 137 MB debug APK; use `adb push` + `pm install` as a workaround.
+
+---
+
+### Audit: Phase 7 (Widgets), 2026-11-13
+
+| Item | Status | Notes |
+|---|---|---|
+| Small widget (progress + "+250 ml") | ✅ | `PebbleSmall` 2×2: Pip, %, amount, progress bar, one-tap "+". `src/features/widgets/water-widgets.tsx`. |
+| Medium widget (progress, Pip, last drink, quick-add) | ✅ | `PebbleMedium` 4×2: Pip, amount / goal, progress, "Last drink HH:MM", the user's first three cups as buttons. |
+| Widget tap logs and refreshes; midnight reset | ✅ | `WIDGET_CLICK` → `addLog` → redraw this and the other widget → `syncReminders`. Midnight: native receiver from `plugins/with-widget-midnight.js` (BUG-003). |
+| Themes: Pastel Aqua (free) + 6 premium + custom accent | ✅ | `src/features/widgets/themes.ts`; `resolveTheme` falls back to Pastel Aqua / no accent without Premium (unit tested). |
+| Widgets gallery + "how to add" guide | ✅ | Widgets tab: live `WidgetPreview` of every theme, "Add small" / "Add wide" (`requestPinWidget`), "Show me how" steps, accent swatches. |
+
+**testing.md §5 results (emulator, API 37)**
+| Check | Result |
+|---|---|
+| Add from launcher | ✅ both via the pin dialog |
+| Widget "+250 ml" logs and refreshes within ~1s | ✅ both widgets updated in under 1 s; also with the app process killed |
+| Logging in the app updates the widget | ✅ |
+| Widget resets after midnight | ✅ after the BUG-003 fix: app closed, 23:59:30 → 0% at 00:06 |
+| Free user: only free theme; premium locked | ✅ locks on 6 themes and all accents; tapping opens the paywall; placed widgets fall back to Pastel Aqua |
+| Premium user: themes + custom accent | ✅ Night, then Night + blue accent on both widgets (dev "Pretend Premium") |
+| Survives app update and phone restart | ✅ reinstall kept both widgets; release build after a cold boot: widgets drawn, "+" logged, midnight alarm re-armed |
+
+**Deviations / decisions**
+- Midnight reset needed native code (BUG-003): one inexact `setWindow` alarm, 10-min window, no exact-alarm permission. Android's `updatePeriodMillis` (30 min) stays as a backstop.
+- Dev builds draw blank widgets after a reboot until Metro is reachable. Release builds are fine. Test widget restarts on a release build.
+- Widget picker preview images (`assets/images/widget-*-preview.png`) are still the app icon. Replace with real widget screenshots before store listing.
+- Glass is translucent; the gallery shows it over a tinted card.
+- `refreshWidgets()` runs after every log/undo/delete, on app start, on the in-app date rollover, after a reminder action (via `setOnReminderLogged`, avoids an import cycle), and when Premium changes. Phase 9 (purchases) must also call it.
+- Phase 1 "Hello" spike widget removed.
+
+**Code health**
+- Orphaned / unused files: `hello-widget.tsx` removed.
+- TODOs / hard-coded values: placeholder preview images; theme colours are inline in `themes.ts`.
+- Type errors / lint warnings: none. 61 Jest tests pass (2 new theme-gating tests).
+- Premium gating correct? Yes: `resolveTheme` + `isPremium()`.
+- Out-of-scope features accidentally added? No. ("Rewarded ad to try a theme for 24h" is Phase 9.)
+
+**Actions before next phase**
+- [ ] Real widget preview images.
+- [ ] Check widgets on the Galaxy A31 (Samsung One UI launcher, battery saver).
+- [ ] Phase 9: call `refreshWidgets()` after purchase/restore/expiry.

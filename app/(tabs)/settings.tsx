@@ -15,6 +15,7 @@ import {
   syncReminders,
   type ReminderSettings,
 } from '@/features/reminders/reminders';
+import { refreshWidgets } from '@/features/widgets/widget-task-handler';
 import { useTheme } from '@/theme';
 
 /** Phase 5 scope: the Reminders section. The full Settings screen is Phase 10. */
@@ -207,6 +208,7 @@ export default function SettingsScreen() {
                 setSetting(getDb(), DEV_PREMIUM_KEY, v ? '1' : '0');
                 setDevPremium(v);
                 void syncReminders().then(setScheduled);
+                void refreshWidgets();
               }}
             />
           </View>

@@ -21,6 +21,7 @@ import { addNotificationResponseReceivedListener } from 'expo-notifications';
 
 import { getDb } from '@/db';
 import { handleReminderAction, syncReminders } from '@/features/reminders/reminders';
+import { refreshWidgets } from '@/features/widgets/widget-task-handler';
 
 import { useTheme } from '@/theme';
 
@@ -44,6 +45,7 @@ export default function RootLayout() {
     getDb();
     // Reschedule on every app start (settings, timezone or a day may have changed).
     void syncReminders();
+    void refreshWidgets();
     // "+250 ml" pressed while the app is in the foreground.
     const sub = addNotificationResponseReceivedListener((r) => void handleReminderAction(r));
     return () => sub.remove();

@@ -19,6 +19,7 @@ import {
   type Today,
 } from '@/db';
 import { syncReminders } from '@/features/reminders/reminders';
+import { refreshWidgets } from '@/features/widgets/widget-task-handler';
 import { onDataChanged } from '@/lib/data-events';
 import { todayKey } from '@/lib/dates';
 import type { VolumeUnit } from '@/lib/units';
@@ -60,7 +61,10 @@ export function useHydration() {
   // one long timer so clock or timezone changes are picked up too.
   useEffect(() => {
     const id = setInterval(() => {
-      if (todayKey() !== state.today.date) refresh();
+      if (todayKey() !== state.today.date) {
+        refresh();
+        void refreshWidgets(); // midnight reset while the app is open
+      }
     }, 30_000);
     return () => clearInterval(id);
   }, [refresh, state.today.date]);
@@ -72,6 +76,7 @@ export function useHydration() {
       const celebrate = claimGoalCelebration(db);
       refresh();
       void syncReminders(); // auto-pause once the goal is met
+      void refreshWidgets();
       return { log, celebrate };
     },
     [refresh],
@@ -81,6 +86,7 @@ export function useHydration() {
     undoLastLog(getDb());
     refresh();
     void syncReminders();
+    void refreshWidgets();
   }, [refresh]);
 
   const remove = useCallback(
@@ -88,6 +94,7 @@ export function useHydration() {
       deleteLog(getDb(), id);
       refresh();
       void syncReminders();
+      void refreshWidgets();
     },
     [refresh],
   );

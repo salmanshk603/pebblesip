@@ -43,15 +43,28 @@
         {
           "widgets": [
             {
-              "name": "Hello",
+              "name": "PebbleSmall",
               "label": "Pebblesip",
-              "description": "Phase 1 spike widget",
-              "minWidth": "180dp",
+              "description": "Today's progress and a one-tap +250 ml",
+              "minWidth": "110dp",
               "minHeight": "110dp",
-              "targetCellWidth": 3,
+              "targetCellWidth": 2,
               "targetCellHeight": 2,
-              "previewImage": "./assets/images/icon.png",
-              "updatePeriodMillis": 0
+              "previewImage": "./assets/images/widget-small-preview.png",
+              "updatePeriodMillis": 1800000,
+              "resizeMode": "horizontal|vertical"
+            },
+            {
+              "name": "PebbleMedium",
+              "label": "Pebblesip (wide)",
+              "description": "Progress, Pip, last drink and quick-add buttons",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "previewImage": "./assets/images/widget-medium-preview.png",
+              "updatePeriodMillis": 1800000,
+              "resizeMode": "horizontal|vertical"
             }
           ]
         }
@@ -64,6 +77,15 @@
           "locationWhenInUsePermission": "Pebblesip uses your approximate location only to calculate prayer times for Ramadan mode. You can pick a city instead.",
           "isAndroidBackgroundLocationEnabled": false,
           "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "./plugins/with-widget-midnight.js",
+        {
+          "widgets": [
+            "PebbleSmall",
+            "PebbleMedium"
+          ]
         }
       ]
     ],

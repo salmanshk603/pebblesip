@@ -78,11 +78,11 @@
 - [x] Suhoor pre-dawn reminder sequence (premium)
 
 ## Phase 7: Widgets
-- [ ] Small widget (progress + "+250 ml" button)
-- [ ] Medium widget (progress, Pip, last drink, quick-add)
-- [ ] Widget tap logs to SQLite and refreshes; midnight reset refresh
-- [ ] Themes: Pastel Aqua (free) + Zen Stone, Glass, Matcha, Night, Ocean, Sakura (premium) + custom accent
-- [ ] Widgets gallery screen with previews + "how to add a widget" guide
+- [x] Small widget (progress + "+250 ml" button)
+- [x] Medium widget (progress, Pip, last drink, quick-add)
+- [x] Widget tap logs to SQLite and refreshes; midnight reset refresh
+- [x] Themes: Pastel Aqua (free) + Zen Stone, Glass, Matcha, Night, Ocean, Sakura (premium) + custom accent
+- [x] Widgets gallery screen with previews + "how to add a widget" guide
 
 ## Phase 8: Stats & streaks
 - [ ] Streak counter + 7-day bar chart (free)

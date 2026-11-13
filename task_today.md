@@ -4,26 +4,25 @@
 > Prompt: "Read @task_today.md and do only this task. Use @prd.md and @implementation_plan.md for context."
 
 ## Goal
-Phase 6: fasting mode (see `implementation_plan.md` → Phase 6).
+Phase 8: stats & streaks (see `implementation_plan.md` → Phase 8).
 
 ## Requirements
-- Manual eating window (free): reminders only inside the window; goal spread across the window.
-- IF presets 16:8 / 18:6 / 20:4 / OMAD (Premium).
-- Ramadan mode: `adhan` prayer times from coarse location or a manual city; method selector (Premium).
-- Suhoor pre-dawn reminder sequence (Premium).
+- Streak counter + 7-day bar chart (free).
+- 30-day / 12-month charts, averages, best streak, calendar heatmap (Premium).
+- CSV export via share sheet (Premium).
 
 ## Notes
-- Reminder windows come from `src/features/reminders/plan.ts` (`planReminders`); fasting supplies a different window. Windows crossing midnight are already supported.
-- Location must be optional and coarse; the app must work with it denied (manual city).
+- `daily` table and `getRange` / `getStreak` in `src/db/queries.ts` already exist.
+- Premium parts stay behind `usePremium()`.
 
 ## Out of scope for this task
-- Widgets, stats, paywall (Premium parts stay behind `usePremium()` / feature flags).
+- Paywall, purchases, ads (Phase 9).
 
 ## Done when
-- [x] testing.md §4 Fasting mode passes on the emulator
-- [x] `implementation_plan.md` Phase 6 boxes ticked
-- [x] Audit entry written in `audit.md`
+- [ ] testing.md §6 Stats & streaks passes on the emulator
+- [ ] `implementation_plan.md` Phase 8 boxes ticked
+- [ ] Audit entry written in `audit.md`
 
 ## Reference files
-- `prd.md`: §5.5 Fasting mode
-- `design/light/fasting.jpg`
+- `prd.md`: §5.7 Stats & streaks
+- `design/light/stats.jpg`

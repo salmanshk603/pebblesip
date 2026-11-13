@@ -110,6 +110,12 @@ function suhoorContent(n: 1 | 2) {
   };
 }
 
+/** Set by the widgets module so a notification log refreshes widgets without an import cycle. */
+let onLogged: (() => void) | undefined;
+export function setOnReminderLogged(fn: () => void): void {
+  onLogged = fn;
+}
+
 let syncing: Promise<number> | null = null;
 let again = false;
 
@@ -220,6 +226,7 @@ export async function handleReminderAction(
   if (action === ACTION_LOG) {
     addLog(db, { amountMl: ACTION_AMOUNT_ML });
     emitDataChanged();
+    onLogged?.();
   } else {
     await scheduleNotificationAsync({
       content: content(0),
