@@ -36,12 +36,12 @@
 - [ ] App does not request the exact-alarm permission (check manifest)
 
 ## 4. Fasting mode
-- [ ] Manual window: reminders only inside the window (incl. windows crossing midnight)
-- [ ] Goal is spread across the window
-- [ ] IF presets set the correct window (premium)
-- [ ] Ramadan mode: window = Maghrib → Fajr for the selected city/location (premium)
-- [ ] Works with location permission denied (manual city)
-- [ ] Turning fasting mode off restores normal reminders
+- [x] Manual window: reminders only inside the window (incl. windows crossing midnight)
+- [x] Goal is spread across the window
+- [x] IF presets set the correct window (premium)
+- [x] Ramadan mode: window = Maghrib → Fajr for the selected city/location (premium)
+- [x] Works with location permission denied (manual city)
+- [x] Turning fasting mode off restores normal reminders
 
 ## 5. Widgets
 - [ ] Small and medium widgets can be added from the launcher

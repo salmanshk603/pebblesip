@@ -235,3 +235,46 @@ Not tested on the physical phone yet (Samsung battery behaviour is the real-worl
 **Actions before next phase**
 - [ ] Check reminders and the background action on the Galaxy A31 (wireless debugging).
 - [ ] Fasting mode (Phase 6) must plug into `planReminders` as a different window.
+
+---
+
+### Audit: Phase 6 (Fasting mode), 2026-11-13
+
+| Item | Status | Notes |
+|---|---|---|
+| Manual eating window (free); reminders only inside the window | ✅ | `src/features/fasting/window.ts` (pure, tested) gives the window; `syncReminders()` passes it to `planReminders` in place of wake/sleep. Windows crossing midnight work (18:30 → 04:30). |
+| Goal spread across the window | ✅ | `perReminderMl()` splits the goal over the window's reminder slots (rounded to 10 ml). Shown on the fasting screen ("about 510 ml every 2 h") and added to each reminder's text ("About 510 ml now."). |
+| IF presets 16:8 / 18:6 / 20:4 / OMAD (premium) | ✅ | Eating window = start time + 8 / 6 / 4 / 1 h. OMAD is a 1-hour window. |
+| Ramadan mode (premium) | ✅ | `adhan` computes Maghrib (today) → Fajr (tomorrow) on the phone. 12 calculation methods. 16-city manual list, or "Use my approximate location" (coarse only, rounded to 2 decimals, never leaves the phone). |
+| Suhoor pre-dawn sequence (premium) | ✅ | Two reminders, 30 and 15 min before each Fajr, for the same 3-day horizon. Only in Ramadan mode with the switch on. |
+
+**testing.md §4 results (emulator, API 37, device time zone IST)**
+| Check | Result |
+|---|---|
+| Manual window, incl. crossing midnight | ✅ 18:30–04:30 at 2 h: alarms 18:30, 20:30, 22:30, 00:30, 02:30 only (today skipped because the goal was already met) |
+| Goal spread across the window | ✅ 2,550 ml over 18:30–04:30 at 2 h, shown as "about 510 ml every 2 h" |
+| IF presets set the correct window | ✅ 16:8 from 18:30 → 18:30–02:30; all presets covered by unit tests |
+| Ramadan window = Maghrib → Fajr | ✅ Mumbai, Muslim World League, 13 Nov: 18:01 → 05:29. 21 alarms = 15 in the window + 6 Suhoor (04:59/05:14, 05:00/05:15 …) |
+| Works with location denied | ✅ Permission dialog offers approximate only; "Don't allow" shows "Location is off. Pick your city…" and opens the city list |
+| Turning fasting off restores normal reminders | ✅ back to 07:00–21:00 every 2 h (16 alarms) |
+| Locked for free users | ✅ IF/Ramadan show a lock; tapping opens the paywall placeholder. Saved premium modes fall back to the manual window without Premium (unit test). |
+
+**Deviations / decisions**
+- Ramadan window is computed once per sync from today's prayer times and reused for the 3-day horizon (a 1–2 min daily drift). It's recomputed on every app open and log.
+- Prayer times are shown in the device's time zone. A manual city in another time zone gives that city's times converted to local time.
+- IF presets use the "Eating starts" time as the anchor; the end is calculated.
+- Added `expo-location` (coarse only). `ACCESS_FINE_LOCATION` and `ACCESS_BACKGROUND_LOCATION` are blocked in `app.json`.
+- `usePremium()` now has `isPremium()` for non-React code (reminder sync) and a **dev-only** "Pretend Premium" switch in Settings (`__DEV__` only), so premium paths can be tested before RevenueCat (Phase 9).
+- `intervalLabel` moved from `app/(tabs)/settings.tsx` to `src/features/reminders/plan.ts` (shared with the fasting screen).
+- Entry point: Settings → "Fasting mode". The full Settings screen is Phase 10.
+
+**Code health**
+- Orphaned / unused files: `features/fasting/.gitkeep` removed.
+- TODOs / hard-coded values: the city list is a short built-in list; method names and messages are inline English.
+- Type errors / lint warnings: none. 59 Jest tests pass (9 new fasting tests).
+- Premium gating correct? Yes: IF/Ramadan/Suhoor need `isPremium()`, which is false in release builds.
+- Out-of-scope features accidentally added? No.
+
+**Actions before next phase**
+- [ ] Check fasting reminders on the Galaxy A31.
+- [ ] Emulator adb server crashes during a streamed `adb install` of the 137 MB debug APK; use `adb push` + `pm install` as a workaround.

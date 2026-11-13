@@ -5,8 +5,9 @@ import { useCallback, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getDb } from '@/db';
-import { REMINDER_INTERVALS } from '@/features/reminders/plan';
+import { getDb, getSetting, setSetting } from '@/db';
+import { DEV_PREMIUM_KEY } from '@/features/premium/use-premium';
+import { intervalLabel, REMINDER_INTERVALS } from '@/features/reminders/plan';
 import {
   getReminderSettings,
   sendTestReminder,
@@ -16,20 +17,13 @@ import {
 } from '@/features/reminders/reminders';
 import { useTheme } from '@/theme';
 
-/** 30 → "30 min", 90 → "1 h 30 min". */
-export function intervalLabel(m: number): string {
-  const h = Math.floor(m / 60);
-  const r = m % 60;
-  if (!h) return `${r} min`;
-  return r ? `${h} h ${r} min` : `${h} h`;
-}
-
 /** Phase 5 scope: the Reminders section. The full Settings screen is Phase 10. */
 export default function SettingsScreen() {
   const { colors, typography, spacing } = useTheme();
   const [settings, setSettings] = useState<ReminderSettings>(() => getReminderSettings(getDb()));
   const [granted, setGranted] = useState<boolean | null>(null);
   const [scheduled, setScheduled] = useState<number | null>(null);
+  const [devPremium, setDevPremium] = useState(() => getSetting(getDb(), DEV_PREMIUM_KEY) === '1');
 
   const refreshPermission = useCallback(() => {
     void getPermissionsAsync().then((p) => setGranted(p.granted));
@@ -144,6 +138,22 @@ export default function SettingsScreen() {
 
         <Pressable
           accessibilityRole="button"
+          onPress={() => router.push('/fasting')}
+          style={[
+            styles.card,
+            styles.link,
+            { backgroundColor: colors.surfaceContainerLowest, padding: spacing.md },
+          ]}
+        >
+          <MaterialCommunityIcons name="weather-night" size={22} color={colors.primary} />
+          <Text style={[typography.labelLg, { color: colors.onSurface, flex: 1 }]}>
+            Fasting mode
+          </Text>
+          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.outline} />
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
           onPress={() => router.push('/battery-help')}
           style={[
             styles.card,
@@ -177,6 +187,29 @@ export default function SettingsScreen() {
               Dev: send test reminder in 5 s
             </Text>
           </Pressable>
+        ) : null}
+        {__DEV__ ? (
+          <View
+            style={[
+              styles.card,
+              styles.link,
+              { backgroundColor: colors.surfaceContainer, padding: spacing.md },
+            ]}
+          >
+            <MaterialCommunityIcons name="bug-outline" size={22} color={colors.outline} />
+            <Text style={[typography.labelLg, { color: colors.onSurfaceVariant, flex: 1 }]}>
+              Dev: pretend Premium
+            </Text>
+            <Switch
+              accessibilityLabel="Dev: pretend Premium"
+              value={devPremium}
+              onValueChange={(v) => {
+                setSetting(getDb(), DEV_PREMIUM_KEY, v ? '1' : '0');
+                setDevPremium(v);
+                void syncReminders().then(setScheduled);
+              }}
+            />
+          </View>
         ) : null}
       </ScrollView>
     </SafeAreaView>

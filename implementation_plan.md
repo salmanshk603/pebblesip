@@ -72,10 +72,10 @@
 - [x] Premium hooks (smart pacing, quiet hours, snooze), gated by a feature flag
 
 ## Phase 6: Fasting mode
-- [ ] Manual eating window (free); reminders only inside the window; goal spread across the window
-- [ ] IF presets 16:8 / 18:6 / 20:4 / OMAD (premium)
-- [ ] Ramadan mode: `adhan` prayer times from coarse location or a manual city; method selector (premium)
-- [ ] Suhoor pre-dawn reminder sequence (premium)
+- [x] Manual eating window (free); reminders only inside the window; goal spread across the window
+- [x] IF presets 16:8 / 18:6 / 20:4 / OMAD (premium)
+- [x] Ramadan mode: `adhan` prayer times from coarse location or a manual city; method selector (premium)
+- [x] Suhoor pre-dawn reminder sequence (premium)
 
 ## Phase 7: Widgets
 - [ ] Small widget (progress + "+250 ml" button)

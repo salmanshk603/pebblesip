@@ -20,9 +20,9 @@ Phase 6: fasting mode (see `implementation_plan.md` → Phase 6).
 - Widgets, stats, paywall (Premium parts stay behind `usePremium()` / feature flags).
 
 ## Done when
-- [ ] testing.md §4 Fasting mode passes on the emulator
-- [ ] `implementation_plan.md` Phase 6 boxes ticked
-- [ ] Audit entry written in `audit.md`
+- [x] testing.md §4 Fasting mode passes on the emulator
+- [x] `implementation_plan.md` Phase 6 boxes ticked
+- [x] Audit entry written in `audit.md`
 
 ## Reference files
 - `prd.md`: §5.5 Fasting mode

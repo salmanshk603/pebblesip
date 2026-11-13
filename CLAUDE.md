@@ -12,3 +12,33 @@ Workflow rules:
 - Before calling a feature done, check the matching section of `testing.md`.
 - Stack: Expo + TypeScript + Expo Router, local SQLite, no backend in v1.
 - Android policy: never request exact-alarm permissions; location is optional and coarse; no medical claims.
+
+
+# Mobile Development Rules
+
+## General
+- Inspect only files relevant to the current task.
+- Never scan the entire project unnecessarily.
+- Avoid reading generated files and dependencies.
+- Do not rewrite working code.
+- Make the smallest possible changes.
+- Avoid unnecessary explanations.
+
+## Development
+- Follow existing project architecture.
+- Reuse existing components.
+- Keep UI components modular.
+- Avoid unnecessary dependencies.
+- Follow existing naming conventions.
+
+## Debugging
+- Identify the root cause before changing code.
+- Don't make speculative changes.
+- Run only relevant tests.
+- Don't repeatedly inspect unchanged files.
+
+## Communication
+- Give concise progress updates.
+- Summarize changed files.
+- Mention errors only when relevant.
+- Don't repeat previously established context.

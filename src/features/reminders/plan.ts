@@ -6,6 +6,14 @@ export const DEFAULT_INTERVAL: ReminderInterval = 60;
 /** How many calendar days ahead to keep scheduled. Rescheduled on app start and every log. */
 export const DAYS_AHEAD = 3;
 
+/** 30 → "30 min", 90 → "1 h 30 min". */
+export function intervalLabel(m: number): string {
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  if (!h) return `${r} min`;
+  return r ? `${h} h ${r} min` : `${h} h`;
+}
+
 /** Minutes since midnight, e.g. "07:30" → 450. */
 export function toMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(':').map(Number);

@@ -13,12 +13,21 @@ import { Platform } from 'react-native';
 
 import { addLog, getDb, getSetting, getToday, setSetting } from '@/db';
 import type { DB } from '@/db/types';
+import { getFastingConfig } from '@/features/fasting/fasting';
+import { eatingWindow, perReminderMl, suhoorTimes } from '@/features/fasting/window';
 import { KEYS as ONBOARDING_KEYS } from '@/features/onboarding/onboarding';
+import { isPremium } from '@/features/premium/use-premium';
 import { emitDataChanged } from '@/lib/data-events';
 import { FEATURE_FLAGS } from '@/lib/feature-flags';
 import { formatVolume, type VolumeUnit } from '@/lib/units';
 
-import { DEFAULT_INTERVAL, planReminders, REMINDER_INTERVALS, type ReminderInterval } from './plan';
+import {
+  DAYS_AHEAD,
+  DEFAULT_INTERVAL,
+  planReminders,
+  REMINDER_INTERVALS,
+  type ReminderInterval,
+} from './plan';
 
 export const REMINDER_CHANNEL_ID = 'reminders';
 export const REMINDER_CATEGORY = 'reminder';
@@ -84,10 +93,19 @@ export async function ensureReminderChannel(unit: VolumeUnit = 'ml', premiumExtr
   await setNotificationCategoryAsync(REMINDER_CATEGORY, actions);
 }
 
-function content(i: number) {
+function content(i: number, sipHint?: string) {
+  const msg = MESSAGES[i % MESSAGES.length]!;
   return {
     title: 'Pebblesip',
-    body: MESSAGES[i % MESSAGES.length]!,
+    body: sipHint ? `${msg} About ${sipHint} now.` : msg,
+    categoryIdentifier: REMINDER_CATEGORY,
+  };
+}
+
+function suhoorContent(n: 1 | 2) {
+  return {
+    title: 'Suhoor sip',
+    body: `Glass ${n} of 2 before Fajr.`,
     categoryIdentifier: REMINDER_CATEGORY,
   };
 }
@@ -117,8 +135,9 @@ export function syncReminders(premium = false): Promise<number> {
   return syncing;
 }
 
-async function doSync(premium: boolean): Promise<number> {
+async function doSync(premiumArg: boolean): Promise<number> {
   const db = getDb();
+  const premium = premiumArg || isPremium();
   await cancelAllScheduledNotificationsAsync();
   if (getSetting(db, ONBOARDING_KEYS.complete) !== '1') return 0;
   const settings = getReminderSettings(db);
@@ -132,17 +151,23 @@ async function doSync(premium: boolean): Promise<number> {
 
   const now = Date.now();
   const today = getToday(db, now);
+  // Fasting mode swaps the wake–sleep day for the eating window (may cross midnight).
+  const fasting = getFastingConfig(db);
+  const eatWin = eatingWindow(fasting, premium, new Date(now));
+  const sipHint = eatWin
+    ? formatVolume(perReminderMl(today.goalMl, eatWin, settings.intervalMin), unit)
+    : undefined;
   const times = planReminders({
     now,
-    wakeTime: getSetting(db, ONBOARDING_KEYS.wakeTime) ?? '07:00',
-    sleepTime: getSetting(db, ONBOARDING_KEYS.sleepTime) ?? '23:00',
+    wakeTime: eatWin?.start ?? getSetting(db, ONBOARDING_KEYS.wakeTime) ?? '07:00',
+    sleepTime: eatWin?.end ?? getSetting(db, ONBOARDING_KEYS.sleepTime) ?? '23:00',
     intervalMin: settings.intervalMin,
     goalMetToday: today.met,
     ...(extras ? { smartPacing: true, progressToday: today.totalMl / today.goalMl } : {}),
   });
   for (const [i, ts] of times.entries()) {
     await scheduleNotificationAsync({
-      content: content(i),
+      content: content(i, sipHint),
       trigger: {
         type: SchedulableTriggerInputTypes.DATE,
         date: ts,
@@ -150,7 +175,22 @@ async function doSync(premium: boolean): Promise<number> {
       },
     });
   }
-  return times.length;
+  // Premium Suhoor plan: two pre-dawn reminders before each Fajr (Ramadan mode only).
+  let suhoor: number[] = [];
+  if (eatWin && premium && fasting.mode === 'ramadan' && fasting.suhoorPlan && fasting.place) {
+    suhoor = suhoorTimes(fasting.place, fasting.method, now, DAYS_AHEAD);
+    for (const [i, ts] of suhoor.entries()) {
+      await scheduleNotificationAsync({
+        content: suhoorContent(((i % 2) + 1) as 1 | 2),
+        trigger: {
+          type: SchedulableTriggerInputTypes.DATE,
+          date: ts,
+          ...(Platform.OS === 'android' ? { channelId: REMINDER_CHANNEL_ID } : {}),
+        },
+      });
+    }
+  }
+  return times.length + suhoor.length;
 }
 
 /** Remembers handled responses so a press is never logged twice (background + later listener). */
