@@ -23,9 +23,16 @@ export function startAds(): Promise<boolean> {
     try {
       const info = await AdsConsent.gatherConsent();
       canRequest = info.canRequestAds;
+    } catch {
+      // Consent gathering failed (e.g. no consent message published in AdMob yet, or offline).
+      // Google's guidance: still check canRequestAds; outside the EEA/UK it is usually true.
+      canRequest = await AdsConsent.getConsentInfo()
+        .then((i) => i.canRequestAds)
+        .catch(() => false);
+    }
+    try {
       if (canRequest) await mobileAds().initialize();
     } catch {
-      // Consent or SDK failure: no ads this session.
       canRequest = false;
     }
     listeners.forEach((l) => l(canRequest));
