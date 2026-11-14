@@ -6,6 +6,9 @@
 ## Goal
 Phase 11: closed testing (see `implementation_plan.md` → Phase 11).
 
+## Guide
+Follow `docs/closed-testing.md` step by step (accounts, EAS env vars, build, upload, testers).
+
 ## Before uploading (carried over)
 - Fill `src/lib/links.ts`; host the privacy policy.
 - Accounts: `docs/monetization-setup.md` (Play, RevenueCat, AdMob) and `docs/analytics-setup.md` (Sentry, Firebase).

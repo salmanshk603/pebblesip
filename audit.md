@@ -441,3 +441,22 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 - [ ] Fill `src/lib/links.ts` (privacy policy, terms, support email) and host the privacy policy.
 - [ ] Connect Sentry + Firebase (`docs/analytics-setup.md`) and RevenueCat/AdMob (`docs/monetization-setup.md`).
 - [ ] Release build on the Galaxy A31: cold start, airplane-mode run, reminders, widgets.
+
+---
+
+### Audit: Phase 11 (Closed testing), 2026-11-14: prepared, waiting on accounts
+
+| Item | Status | Notes |
+|---|---|---|
+| EAS production build (AAB) → Closed testing | ⏳ | `eas.json`: production = app-bundle, `autoIncrement` versionCode (remote), `environment: production`; submit profile targets the closed (`alpha`) track as draft. `app.json` version 1.0.0. Not built: EAS isn't logged in and the project isn't linked (`eas init`). |
+| Testers ≥ 12 (target 18–20), WhatsApp group | ⏳ | Recruiting message and opt-in steps in `docs/closed-testing.md`. |
+| Fix bugs from `bugs.md`; full `testing.md` each build | ⏳ | Process written in the guide. No open bugs. |
+| Do not pause the track | n/a | Called out in the guide. |
+
+**Found while preparing**
+- `.env.local` is git-ignored, so EAS cloud builds would ship **without** the AdMob/RevenueCat IDs (sample AdMob app ID, no ads, no purchases). The guide adds them as EAS environment variables (`eas env:create … --environment production`).
+
+**Actions (you)**
+- [ ] Play Console account; `npx eas-cli login`; `npx eas-cli init`.
+- [ ] Create the 4 EAS env vars (production).
+- [ ] Build, upload to Closed testing, start recruiting.
