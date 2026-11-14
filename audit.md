@@ -485,3 +485,9 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 - Sentry source-map upload only runs with `SENTRY_AUTH_TOKEN` (`app.config.js` → `disableAutoUpload`); without it `bundleRelease` failed ("An organization ID or slug is required").
 - Verified: `bundleRelease` → `app-release.aab` (139 MB, all ABIs; Play serves per-device splits) signed by `CN=Salman Shaikh` (upload key), not the debug key.
 - Guide: `docs/release-build.md`.
+
+### Polish, 2026-11-14
+- Add-drink stepper in oz mode now moves in whole ounces (`stepVolume` in `src/lib/units.ts`, unit-tested); shown as whole oz. Goal and cup screens already stepped by 1 oz.
+- Widget picker previews are real widget renders (Pastel Aqua, 45%) with rounded transparent corners, replacing the app icon. Verified in the Pixel launcher picker.
+- `testing.md` §1–3 ticked from the Phase 3–5 audits (premium drink factor still to re-check on device); §8 EEA consent and §9 links ticked from today's checks.
+- Note: the emulator app was reinstalled (upload-signed builds can't update a debug-signed install), so its test data was reset.

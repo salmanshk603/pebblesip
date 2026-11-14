@@ -7,33 +7,33 @@
 ---
 
 ## 1. Onboarding
-- [ ] Fresh install shows onboarding; completing it lands on Home
-- [ ] Goal calculates per formula (e.g. 70 kg, moderate, mild → 70×33×1.1 = 2,541 → 2,550 ml)
-- [ ] Goal clamps to 1,200–4,500 ml for extreme inputs
-- [ ] Goal is editable before finishing
-- [ ] ml/oz choice is applied everywhere
-- [ ] Denying notification permission still completes onboarding (with a gentle note)
-- [ ] Relaunching the app does not show onboarding again
+- [x] Fresh install shows onboarding; completing it lands on Home
+- [x] Goal calculates per formula (e.g. 70 kg, moderate, mild → 70×33×1.1 = 2,541 → 2,550 ml)
+- [x] Goal clamps to 1,200–4,500 ml for extreme inputs
+- [x] Goal is editable before finishing
+- [x] ml/oz choice is applied everywhere
+- [x] Denying notification permission still completes onboarding (with a gentle note)
+- [x] Relaunching the app does not show onboarding again
 
 ## 2. Logging (Home)
-- [ ] Quick-add 250 ml updates total, %, ring and Pip state instantly
-- [ ] Undo removes the last entry
-- [ ] Swipe-to-delete removes the correct entry and updates totals
-- [ ] Non-water drink uses its hydration factor (premium)
-- [ ] Reaching 100% triggers the celebration once (not on every later log)
-- [ ] Logs over 100% are allowed and shown correctly
-- [ ] Data survives app kill and phone restart
-- [ ] At local midnight the total resets to 0; yesterday is kept in stats
+- [x] Quick-add 250 ml updates total, %, ring and Pip state instantly
+- [x] Undo removes the last entry
+- [x] Swipe-to-delete removes the correct entry and updates totals
+- [ ] Non-water drink uses its hydration factor (premium) (factor maths unit-tested; re-check on device with Premium)
+- [x] Reaching 100% triggers the celebration once (not on every later log)
+- [x] Logs over 100% are allowed and shown correctly
+- [x] Data survives app kill and phone restart
+- [x] At local midnight the total resets to 0; yesterday is kept in stats
 
 ## 3. Reminders
-- [ ] Reminders fire only between wake and sleep time
-- [ ] Interval change reschedules correctly
-- [ ] "+250 ml" notification action logs without opening the app
-- [ ] Reminders stop for the day after the goal is met
-- [ ] Reminders resume the next morning
-- [ ] Notifications still work after reboot
-- [ ] Turning reminders off cancels all scheduled notifications
-- [ ] App does not request the exact-alarm permission (check manifest)
+- [x] Reminders fire only between wake and sleep time
+- [x] Interval change reschedules correctly
+- [x] "+250 ml" notification action logs without opening the app
+- [x] Reminders stop for the day after the goal is met
+- [x] Reminders resume the next morning
+- [x] Notifications still work after reboot
+- [x] Turning reminders off cancels all scheduled notifications
+- [x] App does not request the exact-alarm permission (check manifest)
 
 ## 4. Fasting mode
 - [x] Manual window: reminders only inside the window (incl. windows crossing midnight)
@@ -69,14 +69,14 @@
 ## 8. Ads
 - [x] Free users see the banner only on Stats (never on Home, never interstitial after logging)
 - [x] Rewarded ad unlocks a theme for 24h, then relocks
-- [ ] EEA/UK consent form shows on first launch (test with UMP debug geography)
+- [x] EEA/UK consent form shows on first launch (test with UMP debug geography)
 - [x] Test ad unit IDs used in dev; real IDs only in production builds
 
 ## 9. Settings & data
 - [x] All settings persist after restart
 - [x] Light / dark / system theme works
 - [x] "Delete all data" wipes logs and settings and returns to onboarding
-- [ ] Privacy policy / support / rate links open correctly
+- [x] Privacy policy / support / rate links open correctly
 
 ## 10. Quality & compliance
 - [ ] Cold start < 2s on a mid-range phone

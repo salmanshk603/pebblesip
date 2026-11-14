@@ -22,7 +22,8 @@ export function initSentry(): void {
   });
   setCrashSink((e) => Sentry.captureException(e));
   // One-off check that events arrive: build once with EXPO_PUBLIC_SENTRY_TEST=1.
-  if (process.env.EXPO_PUBLIC_SENTRY_TEST === '1') Sentry.captureMessage('Pebblesip Sentry test event');
+  if (process.env.EXPO_PUBLIC_SENTRY_TEST === '1')
+    Sentry.captureMessage('Pebblesip Sentry test event');
 }
 
 export { Sentry };

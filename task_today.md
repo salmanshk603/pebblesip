@@ -7,11 +7,11 @@
 Phase 11: closed testing (see `implementation_plan.md` → Phase 11).
 
 ## Guide
-Follow `docs/closed-testing.md` step by step (accounts, EAS env vars, build, upload, testers).
+Builds are manual (no EAS): `docs/release-build.md` for building, `docs/closed-testing.md` from §3 for Play Console, upload and testers. Skip the EAS steps.
 
 ## Before uploading (carried over)
-- Fill `src/lib/links.ts`; host the privacy policy.
-- Accounts: `docs/monetization-setup.md` (Play, RevenueCat, AdMob) and `docs/analytics-setup.md` (Sentry, Firebase).
+- ✅ `src/lib/links.ts` filled; privacy policy + terms hosted on GitHub Pages.
+- Accounts: AdMob ✅, Firebase ✅, Sentry ✅. Still needed: Play Console + RevenueCat (`docs/monetization-setup.md`).
 - Release build on the Galaxy A31: cold start < 2 s, airplane mode, reminders, widgets.
 - Phase 9 purchase tests (testing.md §7) with a license tester.
 

@@ -7,7 +7,7 @@ import { Button } from '@/components/button';
 import type { IconName } from '@/components/choice-card';
 import { Stepper } from '@/components/stepper';
 import { WATER_ID, type Cup, type Drink } from '@/db';
-import { formatVolume, mlToOz, type VolumeUnit } from '@/lib/units';
+import { formatVolume, mlToOz, stepVolume, type VolumeUnit } from '@/lib/units';
 import { useTheme } from '@/theme';
 
 const MIN_ML = 50;
@@ -43,7 +43,7 @@ export function AddDrinkSheet({
   const [lockedHint, setLockedHint] = useState(false);
 
   const clamp = (v: number) => Math.min(MAX_ML, Math.max(MIN_ML, v));
-  const shown = unit === 'oz' ? String(Math.round(mlToOz(amount) * 10) / 10) : String(amount);
+  const shown = unit === 'oz' ? String(Math.round(mlToOz(amount))) : String(Math.round(amount));
   const pct = Math.round((amount / goalMl) * 100);
   const label = [
     typography.labelMd,
@@ -147,8 +147,8 @@ export function AddDrinkSheet({
             label="amount"
             value={shown}
             unit={unit}
-            onDecrement={() => setAmount((a) => clamp(a - STEP_ML))}
-            onIncrement={() => setAmount((a) => clamp(a + STEP_ML))}
+            onDecrement={() => setAmount((a) => clamp(stepVolume(a, -1, unit, STEP_ML)))}
+            onIncrement={() => setAmount((a) => clamp(stepVolume(a, 1, unit, STEP_ML)))}
           />
           <Text
             style={[typography.labelMd, { color: colors.onSurfaceVariant, textAlign: 'center' }]}
