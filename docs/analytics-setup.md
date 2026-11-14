@@ -8,7 +8,11 @@ Events (PRD §9): `onboarding_completed`, `water_logged` (`source`: app / widget
 `goal_met`, `widget_added`, `fasting_enabled`, `paywall_shown`, `purchase_completed`,
 `reminder_tapped`. Props are small and non-identifying; no health data or personal details.
 
-## Sentry (crashes)
+## Sentry (crashes): DONE (2026-11-14)
+`src/lib/sentry.ts`, release builds only, DSN from `SENTRY_DSN` via `app.config.js` `extra`. No PII,
+no tracing, no replay, no console breadcrumbs. Test event: build once with `EXPO_PUBLIC_SENTRY_TEST=1`.
+
+### Original steps
 1. Create a React Native project in Sentry; copy the DSN.
 2. `npx expo install @sentry/react-native`, add its Expo plugin to `app.json`.
 3. In `app/_layout.tsx`: `Sentry.init({ dsn: process.env.EXPO_PUBLIC_SENTRY_DSN })`, wrap the

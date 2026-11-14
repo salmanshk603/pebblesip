@@ -99,7 +99,13 @@
         }
       ],
       "@react-native-firebase/app",
-      "./plugins/with-gradle-memory.js"
+      "./plugins/with-gradle-memory.js",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

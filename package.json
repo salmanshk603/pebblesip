@@ -9,6 +9,7 @@
     "@react-native-community/datetimepicker": "9.2.1",
     "@react-native-firebase/analytics": "^27.1.1",
     "@react-native-firebase/app": "^27.1.1",
+    "@sentry/react-native": "~8.28.0",
     "@shopify/react-native-skia": "2.14.0",
     "adhan": "^4.4.6",
     "drizzle-orm": "^0.45.4",

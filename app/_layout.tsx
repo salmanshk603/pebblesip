@@ -26,15 +26,18 @@ import { getDb } from '@/db';
 import { handleReminderAction, syncReminders } from '@/features/reminders/reminders';
 import { startAds } from '@/features/ads/ads';
 import { track } from '@/lib/analytics';
+import { initSentry, Sentry } from '@/lib/sentry';
 import { applyThemePref, getThemePref } from '@/theme/preference';
 import { initPurchases } from '@/features/premium/purchases';
 import { refreshWidgets } from '@/features/widgets/widget-task-handler';
 
 import { useTheme } from '@/theme';
 
+// Crash reporting must start before anything else can throw.
+initSentry();
 void SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayout() {
   const theme = useTheme();
   const [loaded, error] = useFonts({
     Inter_400Regular,
@@ -92,3 +95,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default Sentry.wrap(RootLayout);

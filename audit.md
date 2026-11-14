@@ -471,3 +471,10 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 - Release builds hit `R8: OutOfMemoryError: Metaspace`; fixed with `plugins/with-gradle-memory.js` (4 GB heap, 1 GB Metaspace).
 - Privacy policy §6 updated (analytics active, no ad ID); data-safety notes in `docs/closed-testing.md` updated.
 - Pending: Sentry; add `GOOGLE_SERVICES_JSON` to EAS before the store build.
+
+### Audit: Sentry, 2026-11-14
+- `@sentry/react-native` 8.28; `src/lib/sentry.ts` (release only, DSN from `SENTRY_DSN` → `extra.sentryDsn`), root wrapped with `Sentry.wrap`, crash sink connected to the analytics facade.
+- Privacy-minded: `sendDefaultPii: false`, `tracesSampleRate: 0`, no screenshots/view hierarchy, console breadcrumbs dropped.
+- Verified: release build logs `RNSentry: Starting with DSN … ingest.de.sentry.io` (EU). Test event sent with `EXPO_PUBLIC_SENTRY_TEST=1`; confirm it on the Sentry Issues page.
+- Source maps not uploaded yet (needs `SENTRY_AUTH_TOKEN`/`SENTRY_ORG`/`SENTRY_PROJECT`).
+- Privacy policy §6 and data-safety notes updated.

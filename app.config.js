@@ -8,6 +8,8 @@ module.exports = ({ config }) => {
       android: { ...config.android, googleServicesFile: process.env.GOOGLE_SERVICES_JSON },
     };
   }
+  // Sentry DSN (not secret, but kept out of git). Read at runtime from expo-constants.
+  config = { ...config, extra: { ...config.extra, sentryDsn: process.env.SENTRY_DSN ?? null } };
   const realId = process.env.ADMOB_ANDROID_APP_ID;
   if (!realId) return config;
   return {

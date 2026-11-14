@@ -30,6 +30,13 @@ npx eas-cli env:create --environment production --name GOOGLE_SERVICES_JSON --ty
 ```
 `app.config.js` points `android.googleServicesFile` at it during cloud builds.
 
+Sentry DSN (crash reports):
+```bash
+npx eas-cli env:create --environment production --name SENTRY_DSN --value "https://…ingest.de.sentry.io/…" --visibility sensitive
+```
+Readable stack traces also need source maps: add `SENTRY_AUTH_TOKEN` (secret), `SENTRY_ORG` and
+`SENTRY_PROJECT` to EAS; without them builds still work, traces are just minified.
+
 `EXPO_PUBLIC_*` values are bundled into the app (they are public by design), so "plaintext" is
 fine. **Never** create `EXPO_PUBLIC_UMP_DEBUG_EEA` in production.
 
@@ -40,7 +47,8 @@ fine. **Never** create `EXPO_PUBLIC_UMP_DEBUG_EEA` in production.
   **13+**; content rating questionnaire; data safety (see below); no government/financial/health
   claims; app access = all features available without login.
 - **Data safety** (current build): data collected = *Device or other IDs* (advertising ID, by AdMob;
-  Firebase app-instance ID), *App activity → App interactions* (Firebase Analytics, for analytics); purchase history (Google
+  Firebase app-instance ID), *App activity → App interactions* (Firebase Analytics, for analytics); *App info and performance →
+  Crash logs, Diagnostics* (Sentry, for app functionality); purchase history (Google
   Play/RevenueCat). Data is encrypted in transit; users can request deletion (Settings → Delete all data).
   Location: approximate, **not** collected (used on device only).
 

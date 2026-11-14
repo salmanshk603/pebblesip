@@ -100,7 +100,7 @@
 ## Phase 10: Settings, polish & compliance
 - [x] Settings screen (prd.md §5.9) incl. "Delete all data"
 - [x] In-app review prompt (3-day streak / first goal met; max once per 30 days)
-- [ ] Sentry + Firebase Analytics events (prd.md §9) (Firebase done; Sentry pending)
+- [x] Sentry + Firebase Analytics events (prd.md §9)
 - [x] Accessibility pass (labels, tap sizes, contrast); RTL check
 - [x] Pip's 4 moods, goal celebration, onboarding reactions, Stats bar animation, reduce-motion fallback (`animations.md`)
 - [x] Final app icon (sea-glass Pip on cream), splash
