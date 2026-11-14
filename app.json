@@ -20,7 +20,8 @@
         "android.permission.USE_EXACT_ALARM",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_BACKGROUND_LOCATION"
-      ]
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       "expo-router",
@@ -96,7 +97,9 @@
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
           "delayAppMeasurementInit": true
         }
-      ]
+      ],
+      "@react-native-firebase/app",
+      "./plugins/with-gradle-memory.js"
     ],
     "experiments": {
       "typedRoutes": true,

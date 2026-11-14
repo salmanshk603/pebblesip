@@ -460,3 +460,14 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 - [ ] Play Console account; `npx eas-cli login`; `npx eas-cli init`.
 - [ ] Create the 4 EAS env vars (production).
 - [ ] Build, upload to Closed testing, start recruiting.
+
+---
+
+### Audit: Firebase Analytics, 2026-11-14
+
+- `@react-native-firebase/app` + `analytics` 27.1.1; `google-services.json` git-ignored (public repo), passed to EAS as a file env var (`GOOGLE_SERVICES_JSON`, read by `app.config.js`).
+- `src/lib/firebase-analytics.ts`: release builds only; after UMP consent, collection is enabled outside GDPR regions or when the user allowed storage + measurement; `ad_storage`/`ad_user_data`/`ad_personalization` false; ad ID collection off (`firebase.json`).
+- Verified on the emulator (release, debug mode): `water_logged {source: app}` logged and uploaded, consent signal `G101`.
+- Release builds hit `R8: OutOfMemoryError: Metaspace`; fixed with `plugins/with-gradle-memory.js` (4 GB heap, 1 GB Metaspace).
+- Privacy policy §6 updated (analytics active, no ad ID); data-safety notes in `docs/closed-testing.md` updated.
+- Pending: Sentry; add `GOOGLE_SERVICES_JSON` to EAS before the store build.

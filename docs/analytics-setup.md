@@ -15,7 +15,12 @@ Events (PRD §9): `onboarding_completed`, `water_logged` (`source`: app / widget
    root with `Sentry.wrap`, and call `setCrashSink(Sentry.captureException)`.
 4. Add `EXPO_PUBLIC_SENTRY_DSN` to `.env.local`.
 
-## Firebase Analytics
+## Firebase Analytics: DONE (2026-11-14)
+`src/lib/firebase-analytics.ts` connects the facade after the UMP consent flow, release builds only;
+`firebase.json` keeps auto-collection, ad ID and ad personalisation off. Verify with
+`adb shell setprop debug.firebase.analytics.app com.salmanshaikh.pebblesip` + Firebase DebugView.
+
+### Original steps
 1. Create a Firebase project, add the Android app (`com.salmanshaikh.pebblesip`), download
    `google-services.json` to the project root (don't commit it if the repo is public).
 2. `npx expo install @react-native-firebase/app @react-native-firebase/analytics`, add the

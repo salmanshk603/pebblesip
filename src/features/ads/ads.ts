@@ -4,6 +4,8 @@ import mobileAds, {
   TestIds,
 } from 'react-native-google-mobile-ads';
 
+import { initFirebaseAnalytics } from '@/lib/firebase-analytics';
+
 /**
  * AdMob setup (PRD §5.10). Free users only: one banner on Stats, plus an optional rewarded
  * ad to try a Premium widget theme for 24 h. Never on Home, never an interstitial.
@@ -47,6 +49,8 @@ export function startAds(): Promise<boolean> {
     } catch {
       canRequest = false;
     }
+    // Analytics consent follows the same UMP choices.
+    void initFirebaseAnalytics().catch(() => undefined);
     listeners.forEach((l) => l(canRequest));
     return canRequest;
   })();

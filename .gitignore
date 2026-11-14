@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Firebase config (repo is public; EAS gets it as a file env var)
+google-services.json
