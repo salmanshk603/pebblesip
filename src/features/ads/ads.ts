@@ -1,4 +1,8 @@
-import mobileAds, { AdsConsent, TestIds } from 'react-native-google-mobile-ads';
+import mobileAds, {
+  AdsConsent,
+  AdsConsentDebugGeography,
+  TestIds,
+} from 'react-native-google-mobile-ads';
 
 /**
  * AdMob setup (PRD §5.10). Free users only: one banner on Stats, plus an optional rewarded
@@ -21,7 +25,15 @@ const listeners = new Set<(ok: boolean) => void>();
 export function startAds(): Promise<boolean> {
   started ??= (async () => {
     try {
-      const info = await AdsConsent.gatherConsent();
+      // Testing only: EXPO_PUBLIC_UMP_DEBUG_EEA=1 makes this device act as if it were in the EEA
+      // and clears earlier consent, so the form shows on every start. Emulators are automatic
+      // UMP test devices; real phones also need their hash in testDeviceIdentifiers.
+      // Never ship a build with this flag set.
+      const debugEEA = process.env.EXPO_PUBLIC_UMP_DEBUG_EEA === '1';
+      if (debugEEA) AdsConsent.reset();
+      const info = await AdsConsent.gatherConsent(
+        debugEEA ? { debugGeography: AdsConsentDebugGeography.EEA } : undefined,
+      );
       canRequest = info.canRequestAds;
     } catch {
       // Consent gathering failed (e.g. no consent message published in AdMob yet, or offline).
