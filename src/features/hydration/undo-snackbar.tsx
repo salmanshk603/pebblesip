@@ -42,5 +42,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 6,
   },
-  action: { minHeight: 44, minWidth: 64, alignItems: 'center', justifyContent: 'center' },
+  action: { minHeight: 48, minWidth: 64, alignItems: 'center', justifyContent: 'center' },
 });

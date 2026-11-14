@@ -400,3 +400,44 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 - [ ] Do `docs/monetization-setup.md` steps 1–4 (Play Console, RevenueCat, AdMob, `.env.local`).
 - [ ] Run testing.md §7 with a license tester; §8 EEA consent with debug geography.
 - [ ] Re-run onboarding once to see the paywall step.
+
+---
+
+### Audit: Phase 10 (Settings, polish & compliance), 2026-11-14
+
+| Item | Status | Notes |
+|---|---|---|
+| Settings screen (§5.9) incl. Delete all data | ✅ | Rebuilt per `design/light/settings.png`: Premium card; Goal & units (daily goal Auto/manual → `app/settings-goal.tsx`, ml/oz, cup sizes → `app/settings-cups.tsx`); Reminders (on/off, interval, wake & bedtime pickers, **sound on/off** via a silent `reminders_quiet` channel, battery guide); Fasting; Appearance (Light/Dark/System, widget theme); Data (Export CSV Premium, Reset today, Delete all data); About (Rate, Support/Privacy/Terms when set in `src/lib/links.ts`, Ad privacy choices when required, Version); "not medical advice" note; dev section in `__DEV__` only. |
+| In-app review prompt | ✅ | `expo-store-review`; after the goal-met celebration, if streak ≥ 3 or first goal met, max once per 30 days (`review-rules.ts`, unit tested). Play only shows the card for Play-installed builds. |
+| Sentry + Firebase Analytics | ⏳ facade only | `src/lib/analytics.ts` with all 8 PRD events wired at their call sites (verified in dev logs). Backends wait for accounts: `docs/analytics-setup.md`. |
+| Accessibility + RTL | ✅ | Tap targets raised to 48dp (segmented controls, chips, links); switch rows tappable across the whole row; widget previews hidden from screen readers. RTL (Arabic app locale): layouts mirror; fixed the "0 / 2,800 ml" total order and forward chevrons. Contrast was not measured with a tool; theme tokens come from the Stitch Material palette. |
+| Pip moods, celebration, onboarding reactions, Stats bars, reduce motion | ✅ | Pip: sleepy (half-closed eyes, breathing, "z"), okay (bob, blink), happy (bigger smile/blush, hop), glowing (glow pulse + 3 sparkles). Onboarding: happy hop on Welcome, sweat drop for "Hot", glowing on the goal step. Paywall: glowing Pip with sparkles. Stats bars grow from 0, staggered 40 ms. All loops/particles off with reduce motion (verified with animations off). |
+| Final app icon + splash | ✅ | Sea-glass Pip on cream from Phase 1 (adaptive + monochrome). |
+
+**testing.md §9 / §10 results (emulator, dev build)**
+| Check | Result |
+|---|---|
+| Settings persist after restart | ✅ Dark theme, goal 2,800 ml (manual) kept after force-stop + relaunch |
+| Light / dark / system | ✅ switches instantly app-wide; reset to System on delete |
+| Delete all data → onboarding | ✅ logs, settings, cups wiped; reminders cancelled; back to Welcome; onboarding again → paywall → Home |
+| Privacy / support / rate links | ½ Rate opens the Play Store listing; Privacy/Terms/Support rows hidden until `src/lib/links.ts` is filled |
+| Monkey test | ✅ 500 events (seed 42), no crash |
+| Screen-reader labels, ≥48dp | ✅ see above |
+| RTL | ✅ see above |
+| No health/medical claims | ✅ copy scanned; disclaimer in Settings |
+| Cold start < 2 s, fully offline | ⏳ need a release build on the phone (dev builds load JS from Metro) |
+
+**Deviations / decisions**
+- Theme uses `Appearance.setColorScheme`, so every `useColorScheme()` consumer follows the choice.
+- Reminder sound off = a second, silent notification channel (Android locks a channel's sound after creation).
+- "Delete all data" clears the cached Premium flag too; RevenueCat restores it on the next start or via Restore.
+- Quiet hours (design) stay behind `FEATURE_FLAGS.premiumReminders`.
+
+**Code health**
+- Type errors / lint: none. 75 Jest tests pass (new: data reset, review rules).
+- Out of scope added? No.
+
+**Actions before closed testing (Phase 11)**
+- [ ] Fill `src/lib/links.ts` (privacy policy, terms, support email) and host the privacy policy.
+- [ ] Connect Sentry + Firebase (`docs/analytics-setup.md`) and RevenueCat/AdMob (`docs/monetization-setup.md`).
+- [ ] Release build on the Galaxy A31: cold start, airplane-mode run, reminders, widgets.

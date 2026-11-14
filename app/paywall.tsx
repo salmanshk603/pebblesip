@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
-import { Pip } from '@/components/pip';
+import { AnimatedPip } from '@/features/hydration/animated-pip';
 import {
   buy,
   loadPlans,
@@ -15,6 +15,7 @@ import {
   restore,
 } from '@/features/premium/purchases';
 import { usePremium } from '@/features/premium/use-premium';
+import { track } from '@/lib/analytics';
 import { useTheme } from '@/theme';
 
 const FEATURES = [
@@ -46,6 +47,10 @@ export default function PaywallScreen() {
   const [msg, setMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    track('paywall_shown', { from: from ?? 'feature' });
+  }, [from]);
+
+  useEffect(() => {
     if (!purchasesAvailable()) return;
     loadPlans()
       .then(setPlans)
@@ -71,8 +76,10 @@ export default function PaywallScreen() {
     setMsg(null);
     const r = await buy(plan);
     setBusy(false);
-    if (r === 'success') close();
-    else if (r === 'error') setMsg('The purchase didn’t go through. You haven’t been charged.');
+    if (r === 'success') {
+      track('purchase_completed', { plan: plan.id });
+      close();
+    } else if (r === 'error') setMsg('The purchase didn’t go through. You haven’t been charged.');
   };
 
   const doRestore = async () => {
@@ -106,7 +113,7 @@ export default function PaywallScreen() {
         </Pressable>
 
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
-          <Pip size={96} />
+          <AnimatedPip size={96} active sipKey={0} progress={1} />
           <Text
             accessibilityRole="header"
             style={[typography.headlineLg, { color: colors.onSurface, textAlign: 'center' }]}
@@ -239,7 +246,7 @@ export default function PaywallScreen() {
           accessibilityRole="button"
           disabled={busy || !purchasesAvailable()}
           onPress={() => void doRestore()}
-          style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center' }}
+          style={{ alignSelf: 'center', minHeight: 48, justifyContent: 'center' }}
         >
           <Text
             style={[

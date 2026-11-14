@@ -5,6 +5,7 @@ import { requestWidgetUpdate, type WidgetTaskHandlerProps } from 'react-native-a
 import { addLog, getDb } from '@/db';
 import { isPremium } from '@/features/premium/use-premium';
 import { setOnReminderLogged, syncReminders } from '@/features/reminders/reminders';
+import { track } from '@/lib/analytics';
 import { emitDataChanged } from '@/lib/data-events';
 
 import {
@@ -44,6 +45,9 @@ export async function widgetTaskHandler({
   if (name !== SMALL_WIDGET && name !== MEDIUM_WIDGET) return;
   switch (widgetAction) {
     case 'WIDGET_ADDED':
+      track('widget_added', { size: name });
+      renderWidget(render(name));
+      break;
     case 'WIDGET_UPDATE':
     case 'WIDGET_RESIZED':
       renderWidget(render(name));
@@ -53,6 +57,7 @@ export async function widgetTaskHandler({
       const ml = Number(clickActionData?.ml);
       if (!Number.isFinite(ml) || ml <= 0) break;
       addLog(getDb(), { amountMl: ml });
+      track('water_logged', { source: 'widget' });
       renderWidget(render(name));
       emitDataChanged();
       // Other placed widgets and reminders (goal may now be met) follow.

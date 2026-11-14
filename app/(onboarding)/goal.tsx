@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
-import { Pip } from '@/components/pip';
+import { AnimatedPip } from '@/features/hydration/animated-pip';
 import { Stepper } from '@/components/stepper';
 import { useDraft } from '@/features/onboarding/draft-context';
 import { finalGoalMl, suggestedGoalMl } from '@/features/onboarding/onboarding';
@@ -32,7 +32,8 @@ export default function GoalScreen() {
       footer={<Button label="Looks good" onPress={() => router.push('/notifications')} />}
     >
       <View style={[styles.center, { gap: spacing.md }]}>
-        <Pip size={120} />
+        {/* Pip celebrates the goal (animations.md). */}
+        <AnimatedPip size={120} active sipKey={0} progress={1} />
         <View
           style={[
             styles.card,

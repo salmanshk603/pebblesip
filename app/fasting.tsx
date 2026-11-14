@@ -24,7 +24,9 @@ import { formatTime, KEYS as ONBOARDING_KEYS, parseTime } from '@/features/onboa
 import { usePremium } from '@/features/premium/use-premium';
 import { intervalLabel, toMinutes } from '@/features/reminders/plan';
 import { getReminderSettings, syncReminders } from '@/features/reminders/reminders';
+import { track } from '@/lib/analytics';
 import { formatVolume, type VolumeUnit } from '@/lib/units';
+import { CHEVRON_FORWARD } from '@/lib/rtl';
 import { useTheme } from '@/theme';
 
 type Picking = 'start' | 'end' | null;
@@ -91,6 +93,7 @@ export default function FastingScreen() {
 
   const save = async () => {
     setFastingConfig(db, cfg);
+    if (cfg.enabled) track('fasting_enabled', { mode: cfg.mode });
     const n = await syncReminders();
     setSaved(
       cfg.enabled
@@ -195,7 +198,7 @@ export default function FastingScreen() {
       </View>
       {right ??
         (onPress ? (
-          <MaterialCommunityIcons name="chevron-right" size={22} color={colors.outline} />
+          <MaterialCommunityIcons name={CHEVRON_FORWARD} size={22} color={colors.outline} />
         ) : null)}
     </Pressable>
   );
@@ -490,7 +493,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  chip: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, justifyContent: 'center' },
+  chip: { minHeight: 48, paddingHorizontal: 14, borderRadius: 20, justifyContent: 'center' },
   track: { height: 14, borderRadius: 7, overflow: 'hidden' },
   seg: { position: 'absolute', top: 0, bottom: 0 },
 });

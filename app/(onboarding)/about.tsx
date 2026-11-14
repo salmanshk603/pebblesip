@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ChoiceCard, type IconName } from '@/components/choice-card';
+import { Pip } from '@/components/pip';
 import { Segmented } from '@/components/segmented';
 import { Stepper } from '@/components/stepper';
 import { useDraft } from '@/features/onboarding/draft-context';
@@ -88,7 +89,15 @@ export default function AboutScreen() {
       </View>
 
       <View style={{ gap: spacing.sm }}>
-        <Text style={label}>Local climate</Text>
+        <View style={[styles.row, { alignItems: 'center' }]}>
+          <Text style={[label, { flex: 1 }]}>Local climate</Text>
+          {/* Pip reacts to the choice: a sweat drop when it's hot. */}
+          <Pip
+            size={40}
+            mood={draft.climate === 'hot' ? 'okay' : 'happy'}
+            sweat={draft.climate === 'hot'}
+          />
+        </View>
         <View style={styles.row} accessibilityRole="radiogroup">
           {CLIMATE.map((c) => (
             <ChoiceCard

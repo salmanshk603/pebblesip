@@ -98,12 +98,12 @@
 - [ ] Test with license testers + test ad units
 
 ## Phase 10: Settings, polish & compliance
-- [ ] Settings screen (prd.md §5.9) incl. "Delete all data"
-- [ ] In-app review prompt (3-day streak / first goal met; max once per 30 days)
+- [x] Settings screen (prd.md §5.9) incl. "Delete all data"
+- [x] In-app review prompt (3-day streak / first goal met; max once per 30 days)
 - [ ] Sentry + Firebase Analytics events (prd.md §9)
-- [ ] Accessibility pass (labels, tap sizes, contrast); RTL check
-- [ ] Pip's 4 moods, goal celebration, onboarding reactions, Stats bar animation, reduce-motion fallback (`animations.md`)
-- [ ] Final app icon (sea-glass Pip on cream), splash
+- [x] Accessibility pass (labels, tap sizes, contrast); RTL check
+- [x] Pip's 4 moods, goal celebration, onboarding reactions, Stats bar animation, reduce-motion fallback (`animations.md`)
+- [x] Final app icon (sea-glass Pip on cream), splash
 
 ## Phase 11: Closed testing (14 days)
 - [ ] EAS production build (AAB) → upload to the Closed testing track

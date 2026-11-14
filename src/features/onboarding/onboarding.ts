@@ -37,6 +37,8 @@ export const KEYS = {
   wakeTime: 'wake_time',
   sleepTime: 'sleep_time',
   volumeUnit: 'volume_unit',
+  /** '1' when the user set the goal by hand; otherwise it follows the formula. */
+  goalManual: 'goal_manual',
 } as const;
 
 export function suggestedGoalMl(d: OnboardingDraft): number {
@@ -46,6 +48,16 @@ export function suggestedGoalMl(d: OnboardingDraft): number {
 export function finalGoalMl(d: OnboardingDraft): number {
   const g = d.goalOverrideMl ?? suggestedGoalMl(d);
   return Math.min(GOAL_MAX_ML, Math.max(GOAL_MIN_ML, Math.round(g)));
+}
+
+/** The formula goal from the stored profile (Settings → Daily goal → Auto). */
+export function storedSuggestedGoalMl(db: DB): number {
+  const w = Number(getSetting(db, KEYS.weightKg));
+  return calcGoalMl(
+    Number.isFinite(w) && w > 0 ? w : DEFAULT_DRAFT.weightKg,
+    (getSetting(db, KEYS.activity) as ActivityLevel | undefined) ?? DEFAULT_DRAFT.activity,
+    (getSetting(db, KEYS.climate) as Climate | undefined) ?? DEFAULT_DRAFT.climate,
+  );
 }
 
 export function isOnboardingComplete(db: DB): boolean {
@@ -64,6 +76,7 @@ export function completeOnboarding(db: DB, d: OnboardingDraft, now: number = Dat
     setSetting(tx, KEYS.sleepTime, d.sleepTime);
     setSetting(tx, KEYS.volumeUnit, d.volumeUnit);
     setGoalMl(tx, goal, now);
+    setSetting(tx, KEYS.goalManual, d.goalOverrideMl !== undefined ? '1' : '0');
     setSetting(tx, KEYS.complete, '1');
   });
   return goal;

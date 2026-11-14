@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, I18nManager } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Pip } from '@/components/pip';
@@ -18,6 +18,9 @@ import { WaterReservoir } from '@/features/hydration/water-reservoir';
 import { usePremium } from '@/features/premium/use-premium';
 import { fromDateKey } from '@/lib/dates';
 import { formatVolume, mlToOz } from '@/lib/units';
+import { getDb, getStreak } from '@/db';
+import { track } from '@/lib/analytics';
+import { maybeAskForReview } from '@/features/review/review';
 import { useTheme } from '@/theme';
 
 const RESERVOIR = 240;
@@ -64,6 +67,9 @@ export default function HomeScreen() {
     const name = drinkId ? (drinkById.get(drinkId)?.name ?? 'Drink') : 'Water';
     setSnack({ id: Date.now(), message: `${name} · ${formatVolume(ml, unit)} added` });
     if (celebrate) {
+      track('goal_met');
+      // Play review card after the goal (Play shows it at most rarely; never blocks anything).
+      setTimeout(() => void maybeAskForReview(getDb(), getStreak(getDb()), true), 2500);
       setBurstKey((k) => k + 1);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -115,7 +121,12 @@ export default function HomeScreen() {
           ]}
         >
           <WaterReservoir size={RESERVOIR} fill={today.totalMl / today.goalMl} active={focused}>
-            <AnimatedPip size={110} active={focused} sipKey={sipKey} />
+            <AnimatedPip
+              size={110}
+              active={focused}
+              sipKey={sipKey}
+              progress={today.totalMl / today.goalMl}
+            />
             <CelebrationBurst playKey={burstKey} radius={RESERVOIR / 2 + 20} />
           </WaterReservoir>
           <View
@@ -278,7 +289,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   card: { borderRadius: 48, alignItems: 'center' },
-  total: { flexDirection: 'row', alignItems: 'baseline' },
+  // "1,200 / 2,550 ml" reads left-to-right even in RTL locales (RN mirrors 'row' under RTL).
+  total: { flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row', alignItems: 'baseline' },
   badge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 999 },
   quick: { flexDirection: 'row', gap: 10 },
   other: {

@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   wrap: { flexDirection: 'row', borderRadius: 999, padding: 3 },
   item: {
     minWidth: 48,
-    minHeight: 36,
+    minHeight: 48, // + 3px wrap padding = 48dp target
     paddingHorizontal: 12,
     borderRadius: 999,
     alignItems: 'center',

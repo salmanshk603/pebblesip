@@ -17,11 +17,16 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useEffect } from 'react';
 
-import { addNotificationResponseReceivedListener } from 'expo-notifications';
+import {
+  DEFAULT_ACTION_IDENTIFIER,
+  addNotificationResponseReceivedListener,
+} from 'expo-notifications';
 
 import { getDb } from '@/db';
 import { handleReminderAction, syncReminders } from '@/features/reminders/reminders';
 import { startAds } from '@/features/ads/ads';
+import { track } from '@/lib/analytics';
+import { applyThemePref, getThemePref } from '@/theme/preference';
 import { initPurchases } from '@/features/premium/purchases';
 import { refreshWidgets } from '@/features/widgets/widget-task-handler';
 
@@ -44,7 +49,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     // Opens the DB, runs migrations and seeds defaults on first launch.
-    getDb();
+    const db = getDb();
+    // Light / dark / system choice from Settings.
+    applyThemePref(getThemePref(db));
     // Reschedule on every app start (settings, timezone or a day may have changed).
     void syncReminders();
     void refreshWidgets();
@@ -52,7 +59,10 @@ export default function RootLayout() {
     void initPurchases();
     void startAds();
     // "+250 ml" pressed while the app is in the foreground.
-    const sub = addNotificationResponseReceivedListener((r) => void handleReminderAction(r));
+    const sub = addNotificationResponseReceivedListener((r) => {
+      if (r.actionIdentifier === DEFAULT_ACTION_IDENTIFIER) track('reminder_tapped');
+      void handleReminderAction(r);
+    });
     return () => sub.remove();
   }, []);
 
@@ -76,6 +86,8 @@ export default function RootLayout() {
         <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
         <Stack.Screen name="fasting" />
         <Stack.Screen name="battery-help" />
+        <Stack.Screen name="settings-goal" />
+        <Stack.Screen name="settings-cups" />
       </Stack>
     </GestureHandlerRootView>
   );

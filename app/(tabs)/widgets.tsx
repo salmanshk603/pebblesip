@@ -134,7 +134,13 @@ export default function WidgetsScreen() {
           <Text style={[typography.headlineSm, { color: colors.onSurface }]}>
             How to add a widget
           </Text>
-          <View style={{ alignItems: 'center' }}>
+          {/* Decorative preview: not tappable, hidden from screen readers. */}
+          <View
+            style={{ alignItems: 'center' }}
+            pointerEvents="none"
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden
+          >
             <WidgetPreview
               renderWidget={() => <MediumWaterWidget d={{ ...data, theme: active }} />}
               width={Math.min(320, width - spacing.margin * 2 - 32)}
@@ -205,7 +211,11 @@ export default function WidgetsScreen() {
                   },
                 ]}
               >
-                <View pointerEvents="none">
+                <View
+                  pointerEvents="none"
+                  importantForAccessibility="no-hide-descendants"
+                  accessibilityElementsHidden
+                >
                   <WidgetPreview
                     renderWidget={() => (
                       <SmallWaterWidget
@@ -289,7 +299,7 @@ export default function WidgetsScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   card: { borderRadius: 24 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, flexWrap: 'wrap' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48, flexWrap: 'wrap' },
   rowBetween: {
     flexDirection: 'row',
     alignItems: 'center',

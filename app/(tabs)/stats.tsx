@@ -1,7 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { File, Paths } from 'expo-file-system';
 import { router, useFocusEffect } from 'expo-router';
-import * as Sharing from 'expo-sharing';
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,9 +18,10 @@ import {
   monthBars,
   monthGrid,
   summarize,
-  toCsv,
 } from '@/features/stats/stats';
 import { StatsBanner } from '@/features/ads/stats-banner';
+import { GrowBar } from '@/features/stats/grow-bar';
+import { exportCsv } from '@/features/stats/export-csv';
 import { onDataChanged } from '@/lib/data-events';
 import { addDays, fromDateKey, todayKey } from '@/lib/dates';
 import { formatVolume, type VolumeUnit } from '@/lib/units';
@@ -109,24 +108,16 @@ export default function StatsScreen() {
   const goal = data.week[data.week.length - 1]?.goalMl ?? 0;
   const max = Math.max(goal, ...bars.map((b) => Math.max(b.totalMl, b.goalMl)), 1);
 
-  const exportCsv = async () => {
+  const onExport = async () => {
     if (!premium) return router.push('/paywall');
-    const first = getFirstDate(getDb());
-    if (!first) return setCsvMsg('Nothing logged yet.');
-    try {
-      const file = new File(Paths.cache, `pebblesip-${data.today}.csv`);
-      if (file.exists) file.delete();
-      file.create();
-      file.write(toCsv(getRange(getDb(), first, data.today)));
-      await Sharing.shareAsync(file.uri, {
-        mimeType: 'text/csv',
-        dialogTitle: 'Export Pebblesip data',
-        UTI: 'public.comma-separated-values-text',
-      });
-      setCsvMsg(null);
-    } catch {
-      setCsvMsg("Couldn't export right now. Please try again.");
-    }
+    const r = await exportCsv();
+    setCsvMsg(
+      r === 'empty'
+        ? 'Nothing logged yet.'
+        : r === 'error'
+          ? "Couldn't export right now. Please try again."
+          : null,
+    );
   };
 
   const card = {
@@ -150,7 +141,7 @@ export default function StatsScreen() {
     future: 'transparent',
   } as const;
 
-  const chartBar = (b: Bar) => {
+  const chartBar = (b: Bar, index: number) => {
     const h = Math.round((b.totalMl / max) * CHART_H);
     const showLabel = period !== 'Month' || b.isCurrent || Number(b.label) % 5 === 0;
     return (
@@ -171,9 +162,11 @@ export default function StatsScreen() {
           {b.met && period === 'Week' ? (
             <MaterialCommunityIcons name="check" size={14} color={colors.primary} />
           ) : null}
-          <View
+          <GrowBar
+            index={index}
+            playKey={period}
+            height={Math.max(h, b.totalMl > 0 ? 4 : 2)}
             style={{
-              height: Math.max(h, b.totalMl > 0 ? 4 : 2),
               width: period === 'Month' ? '70%' : '64%',
               borderRadius: 8,
               backgroundColor: b.met
@@ -366,7 +359,7 @@ export default function StatsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Export CSV${premium ? '' : ', Premium'}`}
-          onPress={() => void exportCsv()}
+          onPress={() => void onExport()}
           style={[styles.card, card, styles.link]}
         >
           <MaterialCommunityIcons name="file-delimited-outline" size={22} color={colors.primary} />

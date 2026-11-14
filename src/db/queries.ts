@@ -203,6 +203,43 @@ export function getFirstDate(db: DB): DateKey | null {
   );
 }
 
+/** Removes today's logs and its daily row ("Reset today"). Returns how many logs were removed. */
+export function resetDay(db: DB, now: number = Date.now()): number {
+  const date = toDateKey(now);
+  return db.transaction((tx) => {
+    const n = tx.select({ id: logs.id }).from(logs).where(eq(logs.date, date)).all().length;
+    tx.delete(logs).where(eq(logs.date, date)).run();
+    tx.delete(daily).where(eq(daily.date, date)).run();
+    return n;
+  });
+}
+
+/** "Delete all data": every log, rollup, setting, cup and custom drink. Call `seed()` after. */
+export function wipeAllData(db: DB): void {
+  db.transaction((tx) => {
+    tx.delete(logs).run();
+    tx.delete(daily).run();
+    tx.delete(settings).run();
+    tx.delete(cups).run();
+    tx.delete(drinks).where(eq(drinks.isCustom, true)).run();
+  });
+}
+
+/** Replaces the cup presets (Settings → Cup sizes), keeping their order. */
+export function setCupAmounts(db: DB, amountsMl: number[]): void {
+  db.transaction((tx) => {
+    const current = tx.select().from(cups).orderBy(asc(cups.sortOrder)).all();
+    amountsMl.forEach((ml, i) => {
+      const c = current[i];
+      if (c)
+        tx.update(cups)
+          .set({ amountMl: Math.round(ml) })
+          .where(eq(cups.id, c.id))
+          .run();
+    });
+  });
+}
+
 export function getCups(db: DB): Cup[] {
   return db.select().from(cups).orderBy(asc(cups.sortOrder)).all();
 }

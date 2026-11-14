@@ -7,6 +7,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/button';
 import { getDb } from '@/db';
 import { useDraft } from '@/features/onboarding/draft-context';
+import { track } from '@/lib/analytics';
 import { completeOnboarding } from '@/features/onboarding/onboarding';
 import { OnboardingShell } from '@/features/onboarding/onboarding-shell';
 import { ensureReminderChannel, syncReminders } from '@/features/reminders/reminders';
@@ -20,6 +21,7 @@ export default function NotificationsScreen() {
 
   const finish = () => {
     completeOnboarding(getDb(), draft);
+    track('onboarding_completed');
     void syncReminders();
     // PRD flow: paywall (dismissible) after onboarding, then Home.
     router.replace({ pathname: '/paywall', params: { from: 'onboarding' } });

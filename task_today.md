@@ -4,24 +4,15 @@
 > Prompt: "Read @task_today.md and do only this task. Use @prd.md and @implementation_plan.md for context."
 
 ## Goal
-Phase 9: monetization (see `implementation_plan.md` → Phase 9).
+Phase 11: closed testing (see `implementation_plan.md` → Phase 11).
 
-## Requirements
-- See `implementation_plan.md` → Phase 9 and `prd.md` (monetization section) for the full list.
-
-## Status (2026-11-13)
-- Code complete. Waiting on accounts: follow `docs/monetization-setup.md`, then run testing.md §7 and the EEA consent check.
-
-## Notes
-- Replace the `usePremium()` / `isPremium()` stub with the real entitlement; keep the dev "Pretend Premium" switch dev-only.
-- After purchase, restore or expiry: call `syncReminders()` and `refreshWidgets()` so reminders and widgets pick up Premium.
-- Paywall entry points already route to `/paywall` (fasting, widgets, stats).
+## Before uploading (carried over)
+- Fill `src/lib/links.ts`; host the privacy policy.
+- Accounts: `docs/monetization-setup.md` (Play, RevenueCat, AdMob) and `docs/analytics-setup.md` (Sentry, Firebase).
+- Release build on the Galaxy A31: cold start < 2 s, airplane mode, reminders, widgets.
+- Phase 9 purchase tests (testing.md §7) with a license tester.
 
 ## Done when
-- [ ] testing.md §7 Premium & purchases passes (license tester)
-- [ ] `implementation_plan.md` Phase 9 boxes ticked
+- [ ] Internal/closed testing build uploaded
+- [ ] `implementation_plan.md` Phase 11 boxes ticked
 - [ ] Audit entry written in `audit.md`
-
-## Reference files
-- `prd.md`: monetization
-- `design/light/paywall.jpg` (if present)

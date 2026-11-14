@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
-import { Pip } from '@/components/pip';
+import { AnimatedPip } from '@/features/hydration/animated-pip';
 import { OnboardingShell } from '@/features/onboarding/onboarding-shell';
 import { useTheme } from '@/theme';
 
@@ -13,7 +13,7 @@ export default function WelcomeScreen() {
     <OnboardingShell step={1} onSkip={next} footer={<Button label="Let's begin" onPress={next} />}>
       <View style={[styles.center, { gap: spacing.md }]}>
         <View style={[styles.halo, { backgroundColor: colors.surfaceContainerLow }]}>
-          <Pip size={180} />
+          <AnimatedPip size={180} active sipKey={0} progress={0.8} />
         </View>
         <View style={[styles.pill, { backgroundColor: colors.secondaryContainer }]}>
           <Text style={[typography.labelMd, { color: colors.onSecondaryContainer }]}>

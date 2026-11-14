@@ -17,6 +17,7 @@ import { getFastingConfig } from '@/features/fasting/fasting';
 import { eatingWindow, perReminderMl, suhoorTimes } from '@/features/fasting/window';
 import { KEYS as ONBOARDING_KEYS } from '@/features/onboarding/onboarding';
 import { isPremium } from '@/features/premium/use-premium';
+import { track } from '@/lib/analytics';
 import { emitDataChanged } from '@/lib/data-events';
 import { FEATURE_FLAGS } from '@/lib/feature-flags';
 import { formatVolume, type VolumeUnit } from '@/lib/units';
@@ -30,6 +31,9 @@ import {
 } from './plan';
 
 export const REMINDER_CHANNEL_ID = 'reminders';
+/** Same reminders without sound (Settings → Reminder sound off). Android fixes a channel's
+ * sound once created, so "sound off" is a separate channel rather than a change. */
+export const QUIET_CHANNEL_ID = 'reminders_quiet';
 export const REMINDER_CATEGORY = 'reminder';
 export const ACTION_LOG = 'log250';
 export const ACTION_SNOOZE = 'snooze15';
@@ -40,6 +44,7 @@ export const REMINDER_KEYS = {
   enabled: 'reminders_enabled',
   interval: 'reminder_interval',
   handled: 'reminder_handled_ids',
+  sound: 'reminder_sound',
 } as const;
 
 const MESSAGES = [
@@ -53,6 +58,7 @@ const MESSAGES = [
 export interface ReminderSettings {
   enabled: boolean;
   intervalMin: ReminderInterval;
+  sound: boolean;
 }
 
 export function getReminderSettings(db: DB): ReminderSettings {
@@ -60,12 +66,17 @@ export function getReminderSettings(db: DB): ReminderSettings {
   const intervalMin = (REMINDER_INTERVALS as readonly number[]).includes(raw)
     ? (raw as ReminderInterval)
     : DEFAULT_INTERVAL;
-  return { enabled: getSetting(db, REMINDER_KEYS.enabled) !== '0', intervalMin };
+  return {
+    enabled: getSetting(db, REMINDER_KEYS.enabled) !== '0',
+    intervalMin,
+    sound: getSetting(db, REMINDER_KEYS.sound) !== '0',
+  };
 }
 
 export function setReminderSettings(db: DB, s: Partial<ReminderSettings>): void {
   if (s.enabled !== undefined) setSetting(db, REMINDER_KEYS.enabled, s.enabled ? '1' : '0');
   if (s.intervalMin !== undefined) setSetting(db, REMINDER_KEYS.interval, String(s.intervalMin));
+  if (s.sound !== undefined) setSetting(db, REMINDER_KEYS.sound, s.sound ? '1' : '0');
 }
 
 /** Channel + action buttons. Safe to call repeatedly. */
@@ -74,6 +85,12 @@ export async function ensureReminderChannel(unit: VolumeUnit = 'ml', premiumExtr
     await setNotificationChannelAsync(REMINDER_CHANNEL_ID, {
       name: 'Water reminders',
       importance: AndroidImportance.DEFAULT,
+    });
+    await setNotificationChannelAsync(QUIET_CHANNEL_ID, {
+      name: 'Water reminders (silent)',
+      importance: AndroidImportance.LOW,
+      sound: null,
+      enableVibrate: false,
     });
   }
   const actions = [
@@ -147,6 +164,7 @@ async function doSync(premiumArg: boolean): Promise<number> {
   await cancelAllScheduledNotificationsAsync();
   if (getSetting(db, ONBOARDING_KEYS.complete) !== '1') return 0;
   const settings = getReminderSettings(db);
+  const channel = settings.sound ? REMINDER_CHANNEL_ID : QUIET_CHANNEL_ID;
   if (!settings.enabled) return 0;
   const { granted } = await getPermissionsAsync();
   if (!granted) return 0;
@@ -177,7 +195,7 @@ async function doSync(premiumArg: boolean): Promise<number> {
       trigger: {
         type: SchedulableTriggerInputTypes.DATE,
         date: ts,
-        ...(Platform.OS === 'android' ? { channelId: REMINDER_CHANNEL_ID } : {}),
+        ...(Platform.OS === 'android' ? { channelId: channel } : {}),
       },
     });
   }
@@ -191,7 +209,7 @@ async function doSync(premiumArg: boolean): Promise<number> {
         trigger: {
           type: SchedulableTriggerInputTypes.DATE,
           date: ts,
-          ...(Platform.OS === 'android' ? { channelId: REMINDER_CHANNEL_ID } : {}),
+          ...(Platform.OS === 'android' ? { channelId: channel } : {}),
         },
       });
     }
@@ -225,6 +243,7 @@ export async function handleReminderAction(
 
   if (action === ACTION_LOG) {
     addLog(db, { amountMl: ACTION_AMOUNT_ML });
+    track('water_logged', { source: 'notification' });
     emitDataChanged();
     onLogged?.();
   } else {

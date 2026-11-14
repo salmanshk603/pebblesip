@@ -18,6 +18,7 @@ import {
   type Log,
   type Today,
 } from '@/db';
+import { track } from '@/lib/analytics';
 import { syncReminders } from '@/features/reminders/reminders';
 import { refreshWidgets } from '@/features/widgets/widget-task-handler';
 import { onDataChanged } from '@/lib/data-events';
@@ -73,6 +74,7 @@ export function useHydration() {
     (amountMl: number, drinkId?: string): { log: Log; celebrate: boolean } => {
       const db = getDb();
       const log = addLog(db, { amountMl, drinkId });
+      track('water_logged', { source: 'app' });
       const celebrate = claimGoalCelebration(db);
       refresh();
       void syncReminders(); // auto-pause once the goal is met

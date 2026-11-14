@@ -73,16 +73,16 @@
 - [x] Test ad unit IDs used in dev; real IDs only in production builds
 
 ## 9. Settings & data
-- [ ] All settings persist after restart
-- [ ] Light / dark / system theme works
-- [ ] "Delete all data" wipes logs and settings and returns to onboarding
+- [x] All settings persist after restart
+- [x] Light / dark / system theme works
+- [x] "Delete all data" wipes logs and settings and returns to onboarding
 - [ ] Privacy policy / support / rate links open correctly
 
 ## 10. Quality & compliance
 - [ ] Cold start < 2s on a mid-range phone
-- [ ] No crashes in a 10-minute monkey test (`adb shell monkey -p <package> 500`)
+- [x] No crashes in a 10-minute monkey test (`adb shell monkey -p <package> 500`)
 - [ ] Works fully offline (airplane mode)
-- [ ] Screen-reader labels on main buttons; tap targets ≥ 48dp
-- [ ] RTL layout (Arabic/Urdu) doesn't break
-- [ ] No health/medical claims in the app text
+- [x] Screen-reader labels on main buttons; tap targets ≥ 48dp
+- [x] RTL layout (Arabic/Urdu) doesn't break
+- [x] No health/medical claims in the app text
 - [ ] Data safety form matches the SDKs actually included

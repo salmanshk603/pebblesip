@@ -90,5 +90,5 @@ const styles = StyleSheet.create({
   },
   dots: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   dot: { height: 8, borderRadius: 4 },
-  skip: { minHeight: 44, justifyContent: 'center' },
+  skip: { minHeight: 48, justifyContent: 'center' },
 });
