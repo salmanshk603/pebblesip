@@ -6,6 +6,10 @@ drop-offs don't reset the clock. **Never pause the track** during the 14 days.
 
 Steps marked **(you)** need your accounts or passwords.
 
+> **Builds are made locally, not with EAS** (decided 2026-11-14): see `docs/release-build.md`.
+> The EAS steps below (§1 Expo account, §2 EAS env vars, §4 `eas build`/`eas submit`) are kept only
+> as an alternative.
+
 ## 1. Accounts (you)
 1. Google Play Console developer account (one-time US$25), identity verified.
 2. Expo account: `npx eas-cli login`.

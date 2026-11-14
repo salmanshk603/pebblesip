@@ -478,3 +478,10 @@ Pure maths in `src/features/stats/stats.ts` (8 unit tests). New queries `getMetD
 - Verified: release build logs `RNSentry: Starting with DSN … ingest.de.sentry.io` (EU). Test event sent with `EXPO_PUBLIC_SENTRY_TEST=1`; confirm it on the Sentry Issues page.
 - Source maps not uploaded yet (needs `SENTRY_AUTH_TOKEN`/`SENTRY_ORG`/`SENTRY_PROJECT`).
 - Privacy policy §6 and data-safety notes updated.
+
+### Release signing (manual builds), 2026-11-14
+- Decision: local Gradle builds instead of EAS. `plugins/with-release-signing.js` adds a `release` signing config fed by `~/.gradle/gradle.properties` (outside the repo).
+- `app.json`: `android.versionCode` 1 (bump by hand each upload).
+- Sentry source-map upload only runs with `SENTRY_AUTH_TOKEN` (`app.config.js` → `disableAutoUpload`); without it `bundleRelease` failed ("An organization ID or slug is required").
+- Verified: `bundleRelease` → `app-release.aab` (139 MB, all ABIs; Play serves per-device splits) signed by `CN=Salman Shaikh` (upload key), not the debug key.
+- Guide: `docs/release-build.md`.

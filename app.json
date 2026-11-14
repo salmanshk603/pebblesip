@@ -21,7 +21,8 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_BACKGROUND_LOCATION"
       ],
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 1
     },
     "plugins": [
       "expo-router",
@@ -105,7 +106,8 @@
         {
           "url": "https://sentry.io/"
         }
-      ]
+      ],
+      "./plugins/with-release-signing.js"
     ],
     "experiments": {
       "typedRoutes": true,
